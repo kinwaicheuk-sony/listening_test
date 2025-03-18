@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import uuid
+import datetime
 
 # Directory to store user ratings
 ratings_dir = "user_ratings"
@@ -9,23 +10,31 @@ os.makedirs(ratings_dir, exist_ok=True)
 
 # Store ratings in session state
 if "ratings" not in st.session_state:
-    st.session_state.ratings = {}  # Store ratings per audio file
+    st.session_state.ratings = {}  # Store ratings per question
 
 if "user_info_collected" not in st.session_state:
     st.session_state.user_info_collected = False
     st.session_state.listener_id = str(uuid.uuid4())[:8]  # Auto-generate listener ID
     st.session_state.age = None
     st.session_state.music_training_years = None
-    st.session_state.audio_index = 0  # Track current audio
-    st.session_state.test_completed = False  # Track if test is completed
-    st.session_state.current_rating = 3  # Default slider value
+    st.session_state.question_index = 0  # Track current question
+    st.session_state.test_completed = False
+    st.session_state.start_time = datetime.datetime.now()
 
 # Audio file paths
-audio_files = [
+audio_questions = [
     [    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/0_train_chunk_id_25378.mp3",
     "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/1_train_chunk_id_129190.mp3",
     "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/7_train_chunk_id_66396.mp3"
-    ] 
+    ],
+    [    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/0_train_chunk_id_25378.mp3",
+    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/1_train_chunk_id_129190.mp3",
+    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/7_train_chunk_id_66396.mp3"
+    ],
+    [    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/0_train_chunk_id_25378.mp3",
+    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/1_train_chunk_id_129190.mp3",
+    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/7_train_chunk_id_66396.mp3"
+    ]        
 ]
 
 # Title
@@ -38,6 +47,18 @@ if not st.session_state.user_info_collected:
     st.session_state.music_training_years = st.selectbox("Years of music training", list(range(51)))
     
     if st.button("Submit & Start Test"):
+        # Save metadata to CSV at the beginning
+        user_ratings_file = os.path.join(ratings_dir, f"{st.session_state.listener_id}.csv")
+        metadata = {
+            "listener_id": st.session_state.listener_id,
+            "age": st.session_state.age,
+            "music_training_years": st.session_state.music_training_years,
+            "start_time": st.session_state.start_time
+        }
+        metadata_df = pd.DataFrame([metadata])
+        metadata_df.to_csv(user_ratings_file, index=False)
+        st.session_state.user_ratings_file = user_ratings_file  # Store in session
+        
         st.session_state.user_info_collected = True
         st.success("Information saved! Proceed to the test.")
         st.rerun()
@@ -47,18 +68,15 @@ else:
     # ==== Highlight version ====
     # Show progress as a list of audio files with visual indicators
     st.write("### Progress")
-    cols = st.columns(5)  # Adjust the number of columns as needed
-    for idx, file in enumerate(audio_files):
-        if file in st.session_state.ratings:
-            status = "✅"
-        elif idx == st.session_state.audio_index:
-            status = "▶️"  # Highlight the current audio being rated
-        else:
-            status = "⬜"
+    cols = st.columns(len(audio_questions))  # Adjust column count
+
+    for idx in range(len(audio_questions)):
+        completed = idx in st.session_state.ratings  # Check if the question has been rated
+        status = "✅" if completed else ("▶️" if idx == st.session_state.question_index else "⬜")
         
-        with cols[idx % 5]:  # Arrange buttons in a row
-            if st.button(f"{idx+1} {status} "):
-                st.session_state.audio_index = idx
+        with cols[idx % 5]:  # Arrange in rows
+            if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):
+                st.session_state.question_index = idx
                 st.rerun()
     # ===== Slider Bar version =====
     # st.write(f"ID: {st.session_state.listener_id}")
@@ -68,30 +86,75 @@ else:
     #     st.session_state.audio_index = selected_index
     #     st.rerun()
     
-    # Get current audio file
-    audio_file_path = audio_files[st.session_state.audio_index]
+    # Get current question audio files
+    audio_files = audio_questions[st.session_state.question_index]
     
-    # Display audio
-    st.audio(audio_file_path, format="audio/mp3")
+    # Display audio in a grid layout
+    st.write(f'Listener ID: {st.session_state.listener_id}')
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("### source")
+        st.audio(audio_files[0], format="audio/mp3")
+    with col2:
+        st.write("### target")
+        st.audio(audio_files[1], format="audio/mp3")
+    
+    st.write("### edited result")
+    st.audio(audio_files[2], format="audio/mp3")
+    
+    # Collect ratings
+    default_ratings = st.session_state.ratings.get(tuple(audio_files), [3, 3, 3])
+    score_a = st.slider("### Score A", 1, 5, default_ratings[0], key=f"score_a_{st.session_state.question_index}")
+    score_b = st.slider("### Score B", 1, 5, default_ratings[1], key=f"score_b_{st.session_state.question_index}")
+    score_c = st.slider("### Score C", 1, 5, default_ratings[2], key=f"score_c_{st.session_state.question_index}")
+    
+    if st.button("Submit Ratings"):
+        if tuple(audio_files) not in st.session_state.ratings:
+            st.session_state.ratings[st.session_state.question_index] = [score_a, score_b, score_c]
 
-    # Collect rating
-    default_rating = st.session_state.ratings.get(audio_file_path, 3)
-    rating = st.slider("Rate this audio", 1, 5, default_rating, key=f"rating_slider_{st.session_state.audio_index}")
-    
-    if st.button("Submit Rating"):
-        st.session_state.ratings[audio_file_path] = rating
-        
-        # Save ratings to a user-specific CSV file
-        user_ratings_file = os.path.join(ratings_dir, f"{st.session_state.listener_id}.csv")
-        user_df = pd.DataFrame([{ "listener_id": st.session_state.listener_id, "age": st.session_state.age, "music_training_years": st.session_state.music_training_years, "filename": file, "rating": rate} for file, rate in st.session_state.ratings.items()])
-        user_df.to_csv(user_ratings_file, index=False)
-        
-        # Move to next audio only if all files are rated
-        if len(st.session_state.ratings) >= len(audio_files):
+            # Load existing data
+            user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
+
+            if not st.session_state.test_completed:
+                # Append a new row if question does not exist
+                new_entry = pd.DataFrame([{
+                    "question": st.session_state.question_index,
+                    "Score A": score_a,
+                    "Score B": score_b,
+                    "Score C": score_c,
+                }])
+                user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
+
+                # Save back to CSV (overwrite the file)
+                user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)    
+
+        if len(st.session_state.ratings) >= len(audio_questions):
             st.session_state.test_completed = True
+            finish_time = datetime.datetime.now()
+
+            # Load existing data
+            user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
+
+
+            user_ratings_df.loc[user_ratings_df["question"] == st.session_state.question_index, ["Score A", "Score B", "Score C"]] = [score_a, score_b, score_c]
+
+            # Check if finish_time column exists, if not, add it
+            if "finish_time" in user_ratings_df.columns:
+                user_ratings_df.at[0, "finish_time"] = finish_time  # Update the first row
+            else:
+                user_ratings_df["finish_time"] = None  # Create column if missing
+                user_ratings_df.at[0, "finish_time"] = finish_time  # Assign value
+
+            # Save back to CSV (overwrite the file)
+            user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
+
         else:
-            st.session_state.audio_index = (st.session_state.audio_index + 1) % len(audio_files)
-        
+            # Move to the next unanswered question
+            for i in range(len(audio_questions)):
+                if i not in st.session_state.ratings:  # Find first unanswered question
+                    st.session_state.question_index = i
+                    break  # Stop searching once we find an unanswered question
+            
         st.rerun()
     
     # Ensure all ratings are completed before moving to the summary

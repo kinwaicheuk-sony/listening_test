@@ -75,6 +75,32 @@ audio_questions = [
 # Title
 st.title("Audio Rating App")
 
+# Sidebar Navigation
+st.sidebar.title("Navigation")
+page_options = ["User Info", "Tutorial 1", "Tutorial 2", "Test"]
+# Ensure session state page matches available options
+valid_page_mapping = {
+    "user_info": "User Info",
+    "tutorial1": "Tutorial 1",
+    "tutorial2": "Tutorial 2",
+    "test": "Test"
+}
+st.session_state.page = valid_page_mapping.get(st.session_state.page, "User Info")  # Default to 'User Info'
+current_index = page_options.index(st.session_state.page)
+# Sidebar radio but **DO NOT override manually set page**
+page_selection = st.sidebar.radio("Go to:", page_options, index=current_index)
+
+# Ensure navigation follows the correct order
+if page_selection == "User Info":
+    st.session_state.page = "user_info"
+elif page_selection == "Tutorial 1" and st.session_state.user_info_collected:
+    st.session_state.page = "tutorial1"
+elif page_selection == "Tutorial 2" and st.session_state.user_info_collected:
+    st.session_state.page = "tutorial2"
+elif page_selection == "Test" and st.session_state.user_info_collected:
+    st.session_state.page = "test"
+st.sidebar.write(f"**Current Page:** {st.session_state.page}")
+
 if st.session_state.page == "user_info":
     st.write("### Please provide your details before starting the test")
     st.text(f"Your Listener ID: {st.session_state.listener_id}")  # Display auto-generated ID

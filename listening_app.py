@@ -104,7 +104,7 @@ elif st.session_state.page.startswith("tutorial"):
     source, target, edited, default_ratings = tutorial_questions[tutorial_index]
 
     st.write(f"### Tutorial {tutorial_index + 1}: How to Rate")
-    
+    st.write(f'Listener ID: {st.session_state.listener_id}')
     col1, col2 = st.columns(2)
     with col1:
         st.write("### Source")
@@ -154,7 +154,7 @@ elif st.session_state.page == "test":
     
     # Get current question audio files
     audio_files = audio_questions[st.session_state.question_index]
-    
+
     # Display audio in a grid layout
     st.write(f'Listener ID: {st.session_state.listener_id}')
     col1, col2 = st.columns(2)
@@ -167,6 +167,28 @@ elif st.session_state.page == "test":
     
     st.write("### edited result")
     st.audio(audio_files[2], format="audio/mp3")
+
+    # Dislay this message when the test is completed
+    if st.session_state.test_completed:
+        st.write("## Thank you for completing the test!")
+        st.write("### You can close the browser now.")
+        st.write("### Or you can review/edit your ratings by clicking the progress bar")
+        # user_ratings_file = os.path.join(ratings_dir, f"{st.session_state.listener_id}.csv")
+        # if os.path.exists(user_ratings_file):
+        #     user_ratings_df = pd.read_csv(user_ratings_file)
+        #     st.write("### Your Submitted Ratings")
+        #     st.dataframe(user_ratings_df)
+            
+        #     # Allow users to modify their ratings and re-listen
+        #     st.write("### Modify Your Ratings")
+        #     for i, entry in user_ratings_df.iterrows():
+        #         st.audio(entry['filename'], format="audio/mp3")
+        #         new_rating = st.slider(f"Modify rating for {entry['filename']}", 1, 5, entry["rating"], key=f"modify_rating_{i}")
+        #         user_ratings_df.at[i, "rating"] = new_rating
+            
+        #     if st.button("Save Changes"):
+        #         user_ratings_df.to_csv(user_ratings_file, index=False)
+        #         st.success("Your changes have been saved!")    
     
     # Collect ratings
     default_ratings = st.session_state.ratings.get(st.session_state.question_index, [3, 3, 3])
@@ -222,25 +244,3 @@ elif st.session_state.page == "test":
                     break  # Stop searching once we find an unanswered question
             
         st.rerun()
-    
-    # Ensure all ratings are completed before moving to the summary
-    if st.session_state.test_completed:
-        st.write("## Thank you for completing the test!")
-        st.write("### You can close the browser now.")
-        st.write("### Or you can review/edit your ratings by clicking the progress bar")
-        # user_ratings_file = os.path.join(ratings_dir, f"{st.session_state.listener_id}.csv")
-        # if os.path.exists(user_ratings_file):
-        #     user_ratings_df = pd.read_csv(user_ratings_file)
-        #     st.write("### Your Submitted Ratings")
-        #     st.dataframe(user_ratings_df)
-            
-        #     # Allow users to modify their ratings and re-listen
-        #     st.write("### Modify Your Ratings")
-        #     for i, entry in user_ratings_df.iterrows():
-        #         st.audio(entry['filename'], format="audio/mp3")
-        #         new_rating = st.slider(f"Modify rating for {entry['filename']}", 1, 5, entry["rating"], key=f"modify_rating_{i}")
-        #         user_ratings_df.at[i, "rating"] = new_rating
-            
-        #     if st.button("Save Changes"):
-        #         user_ratings_df.to_csv(user_ratings_file, index=False)
-        #         st.success("Your changes have been saved!")

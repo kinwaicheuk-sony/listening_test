@@ -121,7 +121,7 @@ else:
     st.audio(audio_files[2], format="audio/mp3")
     
     # Collect ratings
-    default_ratings = st.session_state.ratings.get(tuple(audio_files), [3, 3, 3])
+    default_ratings = st.session_state.ratings.get(st.session_state.question_index, [3, 3, 3])
     score_a = st.slider("### Score A", 1, 5, default_ratings[0], key=f"score_a_{st.session_state.question_index}")
     score_b = st.slider("### Score B", 1, 5, default_ratings[1], key=f"score_b_{st.session_state.question_index}")
     score_c = st.slider("### Score C", 1, 5, default_ratings[2], key=f"score_c_{st.session_state.question_index}")

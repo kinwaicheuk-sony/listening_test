@@ -8,6 +8,18 @@ import datetime
 ratings_dir = "user_ratings"
 os.makedirs(ratings_dir, exist_ok=True)
 
+# Rating buttons
+def update_rating(value):
+    st.session_state.selected_ratings = value
+
+def render_rating_buttons(num_buttons, label):
+    st.write(f"### {label}")
+    cols = st.columns(num_buttons)
+    for i in range(num_buttons):
+        if cols[i].button(str(i + 1), key=f"btn_{label}_{i}"):
+            # action when the button is pressed
+            update_rating(i)
+
 # Store ratings in session state
 if "ratings" not in st.session_state:
     st.session_state.ratings = {}  # Store ratings per question
@@ -20,22 +32,21 @@ if "user_info_collected" not in st.session_state:
     st.session_state.question_index = 0  # Track current question
     st.session_state.test_completed = False
     st.session_state.start_time = datetime.datetime.now()
+    st.session_state.selected_ratings = None
     if "page" not in st.session_state:
         st.session_state.page = "user_info"  # Start with user info page
 
 # Audio file paths
 tutorial_questions = [
     [
-    "audio/mp3/source1.mp3",
-    "audio/mp3/source1.mp3",
-    "audio/mp3/source1.mp3",
-    [5, 5, 5]
+    "audio/flac/source1.flac",
+    "audio/flac/source1.flac",
+    "audio/flac/source1.flac",
     ],
     [
-    "audio/mp3/source1.mp3",
-    "audio/mp3/target1.mp3",
-    "audio/mp3/target1.mp3",
-    [5, 1, 2]
+    "audio/flac/source1.flac",
+    "audio/flac/target1.flac",
+    "audio/flac/target1.flac",
     ],
 ]
 
@@ -88,7 +99,7 @@ valid_page_mapping = {
 st.session_state.page = valid_page_mapping.get(st.session_state.page, "User Info")  # Default to 'User Info'
 current_index = page_options.index(st.session_state.page)
 # Sidebar radio but **DO NOT override manually set page**
-page_selection = st.sidebar.radio("Go to:", page_options, index=current_index)
+page_selection = st.sidebar.radio("Current progress", page_options, index=current_index)
 
 # Ensure navigation follows the correct order
 if page_selection == "User Info":
@@ -127,25 +138,38 @@ if st.session_state.page == "user_info":
 
 elif st.session_state.page.startswith("tutorial"):
     tutorial_index = 0 if st.session_state.page == "tutorial1" else 1
-    source, target, edited, default_ratings = tutorial_questions[tutorial_index]
+    source, target, edited = tutorial_questions[tutorial_index]
 
     st.write(f"### Tutorial {tutorial_index + 1}: How to Rate")
     st.write(f'Listener ID: {st.session_state.listener_id}')
     col1, col2 = st.columns(2)
     with col1:
         st.write("### Source")
-        st.audio(source, format="audio/mp3")
+        st.audio(source, format="audio/flac")
     with col2:
         st.write("### Target")
-        st.audio(target, format="audio/mp3")
+        st.audio(target, format="audio/flac")
 
-    st.write("### Edited Result")
-    st.audio(edited, format="audio/mp3")
+    # st.write("### Edited Result")
+    # st.audio(edited, format="audio/flac")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("### edited result 1")
+        st.audio(edited, format="audio/flac")
+    with col2:
+        st.write("### edited result 2")
+        st.audio(edited, format="audio/flac")    
+
+    # create buttons
+    render_rating_buttons(2, "Score A")    
 
     # Predefined tutorial ratings
-    score_a = st.slider("### Score A", 1, 5, default_ratings[0], key=f"tutorial_score_a_{tutorial_index}")
-    score_b = st.slider("### Score B", 1, 5, default_ratings[1], key=f"tutorial_score_b_{tutorial_index}")
-    score_c = st.slider("### Score C", 1, 5, default_ratings[2], key=f"tutorial_score_c_{tutorial_index}")
+    # score_a = st.slider("### Score A", 1, 5, default_ratings[0], key=f"tutorial_score_a_{tutorial_index}")
+    # score_b = st.slider("### Score B", 1, 5, default_ratings[1], key=f"tutorial_score_b_{tutorial_index}")
+    # score_c = st.slider("### Score C", 1, 5, default_ratings[2], key=f"tutorial_score_c_{tutorial_index}")
+    # score_a = st.button("### Score A", key=f"score_a_{st.session_state.question_index}")
+    # score_b = st.button("### Score B", key=f"score_b_{st.session_state.question_index}")
+    # score_c = st.button("### Score C", key=f"score_c_{st.session_state.question_index}")
 
     if st.button("Next"): # determines how many tutorials there are
         if tutorial_index == 0:
@@ -166,7 +190,7 @@ elif st.session_state.page == "test":
         completed = idx in st.session_state.ratings  # Check if the question has been rated
         status = "✅" if completed else ("▶️" if idx == st.session_state.question_index else "⬜")
         
-        with cols[idx % 5]:  # Arrange in rows
+        with cols[idx % 10]:  # Arrange in rows
             if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):
                 st.session_state.question_index = idx
                 st.rerun()
@@ -186,13 +210,18 @@ elif st.session_state.page == "test":
     col1, col2 = st.columns(2)
     with col1:
         st.write("### source")
-        st.audio(audio_files[0], format="audio/mp3")
+        st.audio(audio_files[0], format="audio/flac")
     with col2:
         st.write("### target")
-        st.audio(audio_files[1], format="audio/mp3")
+        st.audio(audio_files[1], format="audio/flac")
     
-    st.write("### edited result")
-    st.audio(audio_files[2], format="audio/mp3")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("### edited result 1")
+        st.audio(audio_files[0], format="audio/flac")
+    with col2:
+        st.write("### edited result 2")
+        st.audio(audio_files[1], format="audio/flac")
 
     # Dislay this message when the test is completed
     if st.session_state.test_completed:
@@ -208,7 +237,7 @@ elif st.session_state.page == "test":
         #     # Allow users to modify their ratings and re-listen
         #     st.write("### Modify Your Ratings")
         #     for i, entry in user_ratings_df.iterrows():
-        #         st.audio(entry['filename'], format="audio/mp3")
+        #         st.audio(entry['filename'], format="audio/flac")
         #         new_rating = st.slider(f"Modify rating for {entry['filename']}", 1, 5, entry["rating"], key=f"modify_rating_{i}")
         #         user_ratings_df.at[i, "rating"] = new_rating
             
@@ -218,13 +247,21 @@ elif st.session_state.page == "test":
     
     # Collect ratings
     default_ratings = st.session_state.ratings.get(st.session_state.question_index, [3, 3, 3])
-    score_a = st.slider("### Score A", 1, 5, default_ratings[0], key=f"score_a_{st.session_state.question_index}")
-    score_b = st.slider("### Score B", 1, 5, default_ratings[1], key=f"score_b_{st.session_state.question_index}")
-    score_c = st.slider("### Score C", 1, 5, default_ratings[2], key=f"score_c_{st.session_state.question_index}")
+    # score_a = st.slider("### Score A", 1, 5, default_ratings[0], key=f"score_a_{st.session_state.question_index}")
+    # score_b = st.slider("### Score B", 1, 5, default_ratings[1], key=f"score_b_{st.session_state.question_index}")
+    # score_c = st.slider("### Score C", 1, 5, default_ratings[2], key=f"score_c_{st.session_state.question_index}")
+    # score_a = st.button("### Score A", key=f"score_a_{st.session_state.question_index}")
+
+    # create buttons
+    render_rating_buttons(2, f"Question {st.session_state.question_index+1}: Your answer")
+    # score_b = st.button("### Score B", key=f"score_b_{st.session_state.question_index}")
+    # score_c = st.button("### Score C", key=f"score_c_{st.session_state.question_index}")
+
+
     
     if st.button("Submit Ratings"):
         if tuple(audio_files) not in st.session_state.ratings:
-            st.session_state.ratings[st.session_state.question_index] = [score_a, score_b, score_c]
+            st.session_state.ratings[st.session_state.question_index] = st.session_state.selected_ratings
 
             # Load existing data
             user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
@@ -233,9 +270,7 @@ elif st.session_state.page == "test":
                 # Append a new row if question does not exist
                 new_entry = pd.DataFrame([{
                     "question": st.session_state.question_index,
-                    "Score A": score_a,
-                    "Score B": score_b,
-                    "Score C": score_c,
+                    "selection": st.session_state.selected_ratings,
                 }])
                 user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
 
@@ -249,8 +284,7 @@ elif st.session_state.page == "test":
             # Load existing data
             user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
 
-
-            user_ratings_df.loc[user_ratings_df["question"] == st.session_state.question_index, ["Score A", "Score B", "Score C"]] = [score_a, score_b, score_c]
+            user_ratings_df.loc[user_ratings_df["question"] == st.session_state.question_index, ["selection"]] = [st.session_state.selected_ratings]
 
             # Check if finish_time column exists, if not, add it
             if "finish_time" in user_ratings_df.columns:

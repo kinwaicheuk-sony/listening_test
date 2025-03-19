@@ -23,18 +23,36 @@ if "user_info_collected" not in st.session_state:
 
 # Audio file paths
 audio_questions = [
-    [    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/0_train_chunk_id_25378.mp3",
-    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/1_train_chunk_id_129190.mp3",
-    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/7_train_chunk_id_66396.mp3"
+    [
+    "audio/flac/source1.flac",
+    "audio/flac/target1.flac",
+    "audio/flac/edit1_s1_t1.flac"
     ],
-    [    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/0_train_chunk_id_25378.mp3",
-    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/1_train_chunk_id_129190.mp3",
-    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/7_train_chunk_id_66396.mp3"
+    [
+    "audio/flac/source1.flac",
+    "audio/flac/target1.flac",
+    "audio/flac/edit2_s1_t1.flac"
     ],
-    [    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/0_train_chunk_id_25378.mp3",
-    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/1_train_chunk_id_129190.mp3",
-    "/home/tda/projects/project_mfmt_attribution/references/fsat_kw/attribution_result/cross_attn_1e-06/top10/7_train_chunk_id_66396.mp3"
-    ]        
+    [    
+    "audio/flac/source1.flac",
+    "audio/flac/target2.flac",
+    "audio/flac/edit1_s1_t2.flac"
+    ],
+    [
+    "audio/flac/source1.flac",
+    "audio/flac/target2.flac",
+    "audio/flac/edit2_s1_t2.flac"
+    ],
+    [
+    "audio/flac/source1.flac",
+    "audio/flac/target3.flac",
+    "audio/flac/edit1_s1_t3.flac"
+    ],
+    [
+    "audio/flac/source1.flac",
+    "audio/flac/target3.flac",
+    "audio/flac/edit2_s1_t3.flac"
+    ],
 ]
 
 # Title
@@ -160,7 +178,8 @@ else:
     # Ensure all ratings are completed before moving to the summary
     if st.session_state.test_completed:
         st.write("## Thank you for completing the test!")
-        st.write("### You can close the browse or review/edit your ratings by clicking the progress bar")
+        st.write("### You can close the browser now.")
+        st.write("### Or you can review/edit your ratings by clicking the progress bar")
         # user_ratings_file = os.path.join(ratings_dir, f"{st.session_state.listener_id}.csv")
         # if os.path.exists(user_ratings_file):
         #     user_ratings_df = pd.read_csv(user_ratings_file)

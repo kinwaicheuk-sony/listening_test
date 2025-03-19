@@ -20,8 +20,25 @@ if "user_info_collected" not in st.session_state:
     st.session_state.question_index = 0  # Track current question
     st.session_state.test_completed = False
     st.session_state.start_time = datetime.datetime.now()
+    if "page" not in st.session_state:
+        st.session_state.page = "user_info"  # Start with user info page
 
 # Audio file paths
+tutorial_questions = [
+    [
+    "audio/mp3/source1.mp3",
+    "audio/mp3/source1.mp3",
+    "audio/mp3/source1.mp3",
+    [5, 5, 5]
+    ],
+    [
+    "audio/mp3/source1.mp3",
+    "audio/mp3/target1.mp3",
+    "audio/mp3/target1.mp3",
+    [5, 1, 2]
+    ],
+]
+
 audio_questions = [
     [
     "audio/flac/source1.flac",
@@ -58,7 +75,7 @@ audio_questions = [
 # Title
 st.title("Audio Rating App")
 
-if not st.session_state.user_info_collected:
+if st.session_state.page == "user_info":
     st.write("### Please provide your details before starting the test")
     st.text(f"Your Listener ID: {st.session_state.listener_id}")  # Display auto-generated ID
     st.session_state.age = st.number_input("Enter your age", min_value=10, max_value=100, step=1)
@@ -78,9 +95,40 @@ if not st.session_state.user_info_collected:
         st.session_state.user_ratings_file = user_ratings_file  # Store in session
         
         st.session_state.user_info_collected = True
+        st.session_state.page = "tutorial1"  # Move to the first tutorial
         st.success("Information saved! Proceed to the test.")
         st.rerun()
-else:
+
+elif st.session_state.page.startswith("tutorial"):
+    tutorial_index = 0 if st.session_state.page == "tutorial1" else 1
+    source, target, edited, default_ratings = tutorial_questions[tutorial_index]
+
+    st.write(f"### Tutorial {tutorial_index + 1}: How to Rate")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("### Source")
+        st.audio(source, format="audio/mp3")
+    with col2:
+        st.write("### Target")
+        st.audio(target, format="audio/mp3")
+
+    st.write("### Edited Result")
+    st.audio(edited, format="audio/mp3")
+
+    # Predefined tutorial ratings
+    score_a = st.slider("### Score A", 1, 5, default_ratings[0], key=f"tutorial_score_a_{tutorial_index}")
+    score_b = st.slider("### Score B", 1, 5, default_ratings[1], key=f"tutorial_score_b_{tutorial_index}")
+    score_c = st.slider("### Score C", 1, 5, default_ratings[2], key=f"tutorial_score_c_{tutorial_index}")
+
+    if st.button("Next"): # determines how many tutorials there are
+        if tutorial_index == 0:
+            st.session_state.page = "tutorial2"  # Move to second tutorial
+        else:
+            st.session_state.page = "test"  # Move to the test
+        st.rerun()
+
+elif st.session_state.page == "test":
     # Show progress bar with clickable selection
     # Show progress as a list of audio files with visual indicators
     # ==== Highlight version ====

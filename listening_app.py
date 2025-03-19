@@ -11,13 +11,17 @@ os.makedirs(ratings_dir, exist_ok=True)
 # Rating buttons
 def update_rating(value):
     st.session_state.selected_ratings = value
+    st.session_state.ratings[st.session_state.question_index] = value  # Store user choice
 
 def render_rating_buttons(num_buttons, label):
     st.write(f"### {label}")
     cols = st.columns(num_buttons)
     for i in range(num_buttons):
-        if cols[i].button(str(i + 1), key=f"btn_{label}_{i}"):
-            # action when the button is pressed
+        # Check if this button is the selected one
+        is_selected = (st.session_state.ratings.get(st.session_state.question_index) == i)
+        button_label = f"**{i + 1}** ✅" if is_selected else str(i + 1)
+        
+        if cols[i].button(button_label, key=f"btn_{label}_{i}"):
             update_rating(i)
 
 # Store ratings in session state
@@ -110,7 +114,6 @@ elif page_selection == "Tutorial 2" and st.session_state.user_info_collected:
     st.session_state.page = "tutorial2"
 elif page_selection == "Test" and st.session_state.user_info_collected:
     st.session_state.page = "test"
-st.sidebar.write(f"**Current Page:** {st.session_state.page}")
 
 if st.session_state.page == "user_info":
     st.write("### Please provide your details before starting the test")

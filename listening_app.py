@@ -142,25 +142,45 @@ st.session_state.page = page_selection  # Update session state to match sidebar 
 if st.session_state.page == "User Info":
     st.write("### Please provide your details before starting the test")
     st.text(f"Your Listener ID: {st.session_state.listener_id}")  # Display auto-generated ID
-    st.session_state.age = st.number_input("Enter your age", min_value=10, max_value=100, step=1)
-    st.session_state.music_training_years = st.selectbox("Years of music training", list(range(51)))
+    st.session_state.age = st.number_input("Enter your age", min_value=18, max_value=100, step=1)
+    if 'music_training_years' not in st.session_state:
+        st.session_state.music_training_years = st.selectbox("Years of music training", list(range(51)))
+    else:
+        st.session_state.music_training_years = st.selectbox("Years of music training", list(range(51)), st.session_state.music_training_years)        
+        
     
     if st.button("Submit & Start Test"):
-        # Save metadata to CSV at the beginning
-        user_ratings_file = os.path.join(ratings_dir, f"{st.session_state.listener_id}.csv")
-        metadata = {
-            "listener_id": st.session_state.listener_id,
-            "age": st.session_state.age,
-            "music_training_years": st.session_state.music_training_years,
-            "start_time": st.session_state.start_time
-        }
-        metadata_df = pd.DataFrame([metadata])
-        metadata_df.to_csv(user_ratings_file, index=False)
-        st.session_state.user_ratings_file = user_ratings_file  # Store in session
-        
-        st.session_state.user_info_collected = True
-        st.session_state.page = "Tutorial 1"  # Move to the first tutorial
-        st.success("Information saved! Proceed to the test.")
+        if not st.session_state.test_completed:
+            # Save metadata to CSV at the beginning
+            user_ratings_file = os.path.join(ratings_dir, f"{st.session_state.listener_id}.csv")
+            metadata = {
+                "listener_id": st.session_state.listener_id,
+                "age": st.session_state.age,
+                "music_training_years": st.session_state.music_training_years,
+                "start_time": st.session_state.start_time
+            }
+            metadata_df = pd.DataFrame([metadata])
+            metadata_df.to_csv(user_ratings_file, index=False)
+            st.session_state.user_ratings_file = user_ratings_file  # Store in session
+            
+            st.session_state.user_info_collected = True
+            st.session_state.page = "Tutorial 1"  # Move to the first tutorial
+            st.success("Information saved! Proceed to the test.")
+        elif st.session_state.test_completed:
+             # Modifying existing data when the test is completed
+            finish_time = datetime.datetime.now()
+
+            # Load existing data
+            user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
+
+            # Update anything the listener changed
+            user_ratings_df.at[0, "finish_time"] = finish_time
+            user_ratings_df.at[0, "age"] = st.session_state.age
+            user_ratings_df.at[0, "music_training_years"] = st.session_state.music_training_years
+            user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
+        else:
+            raise ValueError('Case not considered')    
+
         st.rerun()
 
 elif st.session_state.page.startswith("Tutorial"):

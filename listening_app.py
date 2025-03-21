@@ -244,16 +244,20 @@ elif st.session_state.page.startswith("Tutorial"):
 
 elif st.session_state.page == "Listening test":
     # Show progress bar with clickable selection
-    # Show progress as a list of audio files with visual indicators
-    # ==== Highlight version ====
-    # Show progress as a list of audio files with visual indicators
     st.write("### Progress")
     cols = st.columns(len(audio_questions))  # Adjust column count
     st.session_state.question_type = 'test'
 
     for idx in range(len(audio_questions)):
         completed = idx in st.session_state.ratings  # Check if the question has been rated
-        status = "✅" if completed else ("▶️" if idx == st.session_state.test_index else "⬜")
+        is_current = idx == st.session_state.test_index  # Check if it's the current question
+
+        if completed and not is_current:
+            status = "✅"  # Completed question
+        elif is_current:
+            status = "▶️"  # Currently selected question
+        else:
+            status = "⬜"  # Not answered yet
         
         with cols[idx % 10]:  # Arrange in rows
             if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):

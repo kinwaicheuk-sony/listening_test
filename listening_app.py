@@ -32,7 +32,7 @@ def render_rating_buttons(num_buttons, label, instruction):
         f" {instruction}",
         options=list(range(num_buttons)),
         format_func=lambda x: f"Edit {x + 1}",
-        index=previous_selection if previous_selection is not None else 0,
+        index=previous_selection if previous_selection is not None else None,
         key=f"radio_{label}"
     )
 
@@ -40,7 +40,7 @@ def render_rating_buttons(num_buttons, label, instruction):
     if log_dict.get(index) != selected_option:
         log_dict[index] = selected_option
         st.session_state.selected_ratings = selected_option
-        st.rerun()  # Force re-rendering immediately
+        st.rerun()  # Force re-rendering immediately, otherwise double click is required
 
 
 # ========== Parameters Initalization ============
@@ -150,38 +150,41 @@ if st.session_state.page == "User Info":
         
     
     if st.button("Submit & Start Test"):
-        if not st.session_state.test_completed:
-            # Save metadata to CSV at the beginning
-            user_ratings_file = os.path.join(ratings_dir, f"{st.session_state.listener_id}.csv")
-            metadata = {
-                "listener_id": st.session_state.listener_id,
-                "age": st.session_state.age,
-                "music_training_years": st.session_state.music_training_years,
-                "start_time": st.session_state.start_time
-            }
-            metadata_df = pd.DataFrame([metadata])
-            metadata_df.to_csv(user_ratings_file, index=False)
-            st.session_state.user_ratings_file = user_ratings_file  # Store in session
-            
-            st.session_state.user_info_collected = True
-            st.session_state.page = "Tutorial 1"  # Move to the first tutorial
-            st.success("Information saved! Proceed to the test.")
-        elif st.session_state.test_completed:
-             # Modifying existing data when the test is completed
-            finish_time = datetime.datetime.now()
-
-            # Load existing data
-            user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
-
-            # Update anything the listener changed
-            user_ratings_df.at[0, "finish_time"] = finish_time
-            user_ratings_df.at[0, "age"] = st.session_state.age
-            user_ratings_df.at[0, "music_training_years"] = st.session_state.music_training_years
-            user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
+        if st.session_state.age is None or st.session_state.music_training_years is None:
+            st.error("Please fill in all required fields before proceeding.")
         else:
-            raise ValueError('Case not considered')    
+            if not st.session_state.test_completed:
+                # Save metadata to CSV at the beginning
+                user_ratings_file = os.path.join(ratings_dir, f"{st.session_state.listener_id}.csv")
+                metadata = {
+                    "listener_id": st.session_state.listener_id,
+                    "age": st.session_state.age,
+                    "music_training_years": st.session_state.music_training_years,
+                    "start_time": st.session_state.start_time
+                }
+                metadata_df = pd.DataFrame([metadata])
+                metadata_df.to_csv(user_ratings_file, index=False)
+                st.session_state.user_ratings_file = user_ratings_file  # Store in session
+                
+                st.session_state.user_info_collected = True
+                st.session_state.page = "Tutorial 1"  # Move to the first tutorial
+                st.success("Information saved! Proceed to the test.")
+            elif st.session_state.test_completed:
+                # Modifying existing data when the test is completed
+                finish_time = datetime.datetime.now()
 
-        st.rerun()
+                # Load existing data
+                user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
+
+                # Update anything the listener changed
+                user_ratings_df.at[0, "finish_time"] = finish_time
+                user_ratings_df.at[0, "age"] = st.session_state.age
+                user_ratings_df.at[0, "music_training_years"] = st.session_state.music_training_years
+                user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
+            else:
+                raise ValueError('Case not considered')    
+
+            st.rerun()
 
 elif st.session_state.page.startswith("Tutorial"):
     # manually encode page-index mapping
@@ -234,33 +237,56 @@ elif st.session_state.page.startswith("Tutorial"):
         )
 
     if st.button("Next"): # determines how many tutorials there are
-        # Load existing data
-        user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
-        if not st.session_state.test_completed:
-            # Append a new row if question does not exist
-            new_entry = pd.DataFrame([{
-                "question_type": 'tutorial',
-                "question": st.session_state.tutorial_index,
-                "selection": st.session_state.selected_ratings,
-            }])
-            user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
-
-            # Save back to CSV (overwrite the file)
-            user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)    
-
-        st.session_state.tutorial_index += 1
-        if st.session_state.tutorial_index < len(tutorial_questions):
-            # if there are still tutorial questions
-            st.session_state.page = index_page[st.session_state.tutorial_index]  # Move to next page             
-        elif st.session_state.tutorial_index == len(tutorial_questions):
-            st.session_state.page = "Listening test"  # Move to the test
+        finish_time = datetime.datetime.now()
+        if st.session_state.selected_ratings == None and st.session_state.test_completed != True:
+            st.error("Please select your rating before proceeding.")
+        elif st.session_state.selected_ratings == None and st.session_state.test_completed == True:
+            st.error("Rating not changed.")
         else:
-            raise ValueError('Unexpected case')
-        
+            # Load existing data
+            user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
+            if not st.session_state.test_completed:
+                # Append a new row if question does not exist
+                new_entry = pd.DataFrame([{
+                    "question_type": 'tutorial',
+                    "question": st.session_state.tutorial_index,
+                    "selection": st.session_state.selected_ratings,
+                }])
+                user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
 
-           
-        
-        st.rerun()
+                # Save back to CSV (overwrite the file)
+                user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
+            elif st.session_state.test_completed:
+                # Update only the row where both conditions are met
+                user_ratings_df.loc[
+                    (user_ratings_df["question"] == st.session_state.tutorial_index) & 
+                    (user_ratings_df["question_type"] == "tutorial"), 
+                    "selection"
+                ] = st.session_state.selected_ratings
+
+                # Check if finish_time column exists, if not, add it
+                if "finish_time" in user_ratings_df.columns:
+                    user_ratings_df.at[0, "finish_time"] = finish_time  # Update the first row
+                else:
+                    user_ratings_df["finish_time"] = None  # Create column if missing
+                    user_ratings_df.at[0, "finish_time"] = finish_time  # Assign value
+
+                # Save back to CSV (overwrite the file)
+                user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)                
+
+
+            st.session_state.tutorial_index += 1
+            if st.session_state.tutorial_index < len(tutorial_questions):
+                # if there are still tutorial questions
+                st.session_state.page = index_page[st.session_state.tutorial_index]  # Move to next page             
+            elif st.session_state.tutorial_index == len(tutorial_questions):
+                st.session_state.page = "Listening test"  # Move to the test
+            else:
+                raise ValueError('Unexpected case')
+            
+            # reset value before next page
+            st.session_state.selected_ratings = None
+            st.rerun()
 
 elif st.session_state.page == "Listening test":
     # Show progress bar with clickable selection
@@ -325,54 +351,57 @@ elif st.session_state.page == "Listening test":
 
     
     if st.button("Submit Ratings"):
-        if tuple(audio_files) not in st.session_state.ratings:
-            st.session_state.ratings[st.session_state.test_index] = st.session_state.selected_ratings
+        if st.session_state.selected_ratings == None:
+            st.error("Please select your rating before proceeding.")
+        else:        
+            if tuple(audio_files) not in st.session_state.ratings:
+                st.session_state.ratings[st.session_state.test_index] = st.session_state.selected_ratings
 
-            # Load existing data
-            user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
+                # Load existing data
+                user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
 
-            if not st.session_state.test_completed:
-                # Append a new row if question does not exist
-                new_entry = pd.DataFrame([{
-                    "question_type": 'test',
-                    "question": st.session_state.test_index,
-                    "selection": st.session_state.selected_ratings,
-                }])
-                user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
+                if not st.session_state.test_completed:
+                    # Append a new row if question does not exist
+                    new_entry = pd.DataFrame([{
+                        "question_type": 'test',
+                        "question": st.session_state.test_index,
+                        "selection": st.session_state.selected_ratings,
+                    }])
+                    user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
+
+                    # Save back to CSV (overwrite the file)
+                    user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)    
+
+            # Modifying existing data when the test is completed
+            if len(st.session_state.ratings) >= len(audio_questions):
+                st.session_state.test_completed = True
+                finish_time = datetime.datetime.now()
+
+                # Load existing data
+                user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
+
+                # Update only the row where both conditions are met
+                user_ratings_df.loc[
+                    (user_ratings_df["question"] == st.session_state.test_index) & 
+                    (user_ratings_df["question_type"] == "test"), 
+                    "selection"
+                ] = st.session_state.selected_ratings
+
+                # Check if finish_time column exists, if not, add it
+                if "finish_time" in user_ratings_df.columns:
+                    user_ratings_df.at[0, "finish_time"] = finish_time  # Update the first row
+                else:
+                    user_ratings_df["finish_time"] = None  # Create column if missing
+                    user_ratings_df.at[0, "finish_time"] = finish_time  # Assign value
 
                 # Save back to CSV (overwrite the file)
-                user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)    
+                user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
 
-        # Modifying existing data when the test is completed
-        if len(st.session_state.ratings) >= len(audio_questions):
-            st.session_state.test_completed = True
-            finish_time = datetime.datetime.now()
-
-            # Load existing data
-            user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
-
-            # Update only the row where both conditions are met
-            user_ratings_df.loc[
-                (user_ratings_df["question"] == st.session_state.test_index) & 
-                (user_ratings_df["question_type"] == "test"), 
-                "selection"
-            ] = st.session_state.selected_ratings
-
-            # Check if finish_time column exists, if not, add it
-            if "finish_time" in user_ratings_df.columns:
-                user_ratings_df.at[0, "finish_time"] = finish_time  # Update the first row
             else:
-                user_ratings_df["finish_time"] = None  # Create column if missing
-                user_ratings_df.at[0, "finish_time"] = finish_time  # Assign value
-
-            # Save back to CSV (overwrite the file)
-            user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
-
-        else:
-            # Move to the next unanswered question
-            for i in range(len(audio_questions)):
-                if i not in st.session_state.ratings:  # Find first unanswered question
-                    st.session_state.test_index = i
-                    break  # Stop searching once we find an unanswered question
-            
-        st.rerun()
+                # Move to the next unanswered question
+                for i in range(len(audio_questions)):
+                    if i not in st.session_state.ratings:  # Find first unanswered question
+                        st.session_state.test_index = i
+                        break  # Stop searching once we find an unanswered question
+            st.session_state.selected_ratings = None
+            st.rerun()

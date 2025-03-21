@@ -13,24 +13,34 @@ def update_page():
     st.session_state.page = st.session_state.page_selection
 
 # Rating buttons
-def render_rating_buttons(num_buttons, label):
-    st.write(f"### {label}")
-    cols = st.columns(num_buttons)    
+def render_rating_buttons(num_buttons, label, instruction):
+    st.write(f"##### {label}")
 
-    # Determine which index to use for storing ratings
+    # Determine the index to store ratings
     if st.session_state.question_type == "tutorial":
         index = st.session_state.tutorial_index
         log_dict = st.session_state.ratings_tutorial
     else:
-        index = st.session_state.question_index
+        index = st.session_state.test_index
         log_dict = st.session_state.ratings
-    for i in range(num_buttons):
-        is_selected = (st.session_state.ratings.get(index) == i)
-        button_label = f"**{i + 1}** ✅" if is_selected else str(i + 1)
-        
-        if cols[i].button(button_label, key=f"btn_{label}_{i}"):
-            st.session_state.selected_ratings = i
-            log_dict[index] = i  # Store user choice
+
+    # Retrieve previous selection if it exists
+    previous_selection = log_dict.get(index, None)
+
+    # Use a temporary variable to hold the selection
+    selected_option = st.radio(
+        f" {instruction}",
+        options=list(range(num_buttons)),
+        format_func=lambda x: f"Edit {x + 1}",
+        index=previous_selection if previous_selection is not None else 0,
+        key=f"radio_{label}"
+    )
+
+    # Only update session state if the selection has changed
+    if log_dict.get(index) != selected_option:
+        log_dict[index] = selected_option
+        st.session_state.selected_ratings = selected_option
+        st.rerun()  # Force re-rendering immediately
 
 
 # ========== Parameters Initalization ============
@@ -159,6 +169,10 @@ elif st.session_state.page.startswith("Tutorial"):
         0: 'Tutorial 1',
         1: 'Tutorial 2'
         }
+    instructions = {
+        0: 'edit 1 preserves the melody in the source better and sounds more like the instrument in the target, so edit 1 should be selected.',
+        1: 'edit 2 preserves the melody in the source better and sounds more like the instrument in the target, so edit 2 should be selected.'
+    }
     reverse_index_page = {v: k for k, v in index_page.items()}
     # get index from page name
     st.session_state.tutorial_index = reverse_index_page.get(st.session_state.page, None)    
@@ -172,28 +186,32 @@ elif st.session_state.page.startswith("Tutorial"):
     # fetch audio from the list
     source, target, edited = tutorial_questions[st.session_state.tutorial_index]
 
-    st.write(f"### Tutorial {st.session_state.tutorial_index + 1}: How to Rate")
+    st.write(f"#### Tutorial {st.session_state.tutorial_index + 1}: How to Rate")
     st.write(f'Listener ID: {st.session_state.listener_id}')
     col1, col2 = st.columns(2)
     with col1:
-        st.write("### Source")
+        st.write("#### Source")
         st.audio(source, format="audio/flac")
     with col2:
-        st.write("### Target")
+        st.write("#### Target")
         st.audio(target, format="audio/flac")
 
     # st.write("### Edited Result")
     # st.audio(edited, format="audio/flac")
     col1, col2 = st.columns(2)
     with col1:
-        st.write("### edited result 1")
+        st.write("#### edited result 1")
         st.audio(edited, format="audio/flac")
     with col2:
-        st.write("### edited result 2")
+        st.write("#### edited result 2")
         st.audio(edited, format="audio/flac")    
 
     # create buttons
-    render_rating_buttons(2, "Score A")    
+    render_rating_buttons(
+        2,
+        "Your Anwser",
+        instructions[st.session_state.tutorial_index]
+        )
 
     if st.button("Next"): # determines how many tutorials there are
         # Load existing data
@@ -231,6 +249,7 @@ elif st.session_state.page == "Listening test":
     # Show progress as a list of audio files with visual indicators
     st.write("### Progress")
     cols = st.columns(len(audio_questions))  # Adjust column count
+    st.session_state.question_type = 'test'
 
     for idx in range(len(audio_questions)):
         completed = idx in st.session_state.ratings  # Check if the question has been rated
@@ -248,32 +267,35 @@ elif st.session_state.page == "Listening test":
     st.write(f'Listener ID: {st.session_state.listener_id}')
     col1, col2 = st.columns(2)
     with col1:
-        st.write("### source")
+        st.write("#### source")
         st.audio(audio_files[0], format="audio/flac")
     with col2:
-        st.write("### target")
+        st.write("#### target")
         st.audio(audio_files[1], format="audio/flac")
     
     col1, col2 = st.columns(2)
     with col1:
-        st.write("### edited result 1")
+        st.write("#### edited result 1")
         st.audio(audio_files[0], format="audio/flac")
     with col2:
-        st.write("### edited result 2")
+        st.write("#### edited result 2")
         st.audio(audio_files[1], format="audio/flac")
 
     # Dislay this message when the test is completed
     if st.session_state.test_completed:
-        st.write("## Thank you for completing the test!")
-        st.write("### You can close the browser now.")
-        st.write("### Or you can review/edit your ratings by clicking the progress bar")
+        st.write("### Thank you for completing the test!")
+        st.write("#### You can close the browser now.")
+        st.write("#### Or you can review/edit your ratings by clicking the progress bar")
     
     # Collect ratings
     default_ratings = st.session_state.ratings.get(st.session_state.test_index, [3, 3, 3])
 
 
     # create buttons
-    render_rating_buttons(2, f"Question {st.session_state.test_index+1}: Your answer")
+    render_rating_buttons(
+        2,
+        f"Question {st.session_state.test_index+1}:",
+        "which editing is more successful?")
 
 
 

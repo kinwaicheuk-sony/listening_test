@@ -16,17 +16,28 @@ def update_rating(value):
 def render_rating_buttons(num_buttons, label):
     st.write(f"### {label}")
     cols = st.columns(num_buttons)
+
+    # Determine which index to use for storing ratings
+    index = st.session_state.tutorial_index if st.session_state.question_type == "tutorial" else st.session_state.question_index
+    
     for i in range(num_buttons):
-        # Check if this button is the selected one
-        is_selected = (st.session_state.ratings.get(st.session_state.question_index) == i)
+        is_selected = (st.session_state.ratings.get(index) == i)
         button_label = f"**{i + 1}** ✅" if is_selected else str(i + 1)
         
         if cols[i].button(button_label, key=f"btn_{label}_{i}"):
             update_rating(i)
 
-# Store ratings in session state
+
+# ========== Parameters Initalization ============
+# store ratings in session state
 if "ratings" not in st.session_state:
     st.session_state.ratings = {}  # Store ratings per question
+
+# store question types: flow of the study tutorial -> test
+if "question_type" not in st.session_state:
+    st.session_state.question_type = "tutorial"  # Default to tutorial
+    st.session_state.tutorial_index = 0  # Track tutorial question index separately
+    st.session_state.test_index = 0  # Track test question index separately
 
 if "user_info_collected" not in st.session_state:
     st.session_state.user_info_collected = False
@@ -38,7 +49,9 @@ if "user_info_collected" not in st.session_state:
     st.session_state.start_time = datetime.datetime.now()
     st.session_state.selected_ratings = None
     if "page" not in st.session_state:
-        st.session_state.page = "user_info"  # Start with user info page
+        st.session_state.page = "User Info"  # Start with user info page
+
+# ========== End of Parameters Initalization ============
 
 # Audio file paths
 tutorial_questions = [
@@ -92,30 +105,27 @@ st.title("Audio Rating App")
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
-page_options = ["User Info", "Tutorial 1", "Tutorial 2", "Test"]
+page_options = ["User Info", "Tutorial 1", "Tutorial 2", "Listening test"]
 # Ensure session state page matches available options
-valid_page_mapping = {
-    "user_info": "User Info",
-    "tutorial1": "Tutorial 1",
-    "tutorial2": "Tutorial 2",
-    "test": "Test"
-}
-st.session_state.page = valid_page_mapping.get(st.session_state.page, "User Info")  # Default to 'User Info'
+print(f"Beginning = {st.session_state.page=}")
+# st.session_state.page = valid_page_mapping.get(st.session_state.page, "User Info")  # Default to 'User Info'
+print(f"{st.session_state.page=}")
 current_index = page_options.index(st.session_state.page)
 # Sidebar radio but **DO NOT override manually set page**
 page_selection = st.sidebar.radio("Current progress", page_options, index=current_index)
 
 # Ensure navigation follows the correct order
-if page_selection == "User Info":
-    st.session_state.page = "user_info"
-elif page_selection == "Tutorial 1" and st.session_state.user_info_collected:
-    st.session_state.page = "tutorial1"
-elif page_selection == "Tutorial 2" and st.session_state.user_info_collected:
-    st.session_state.page = "tutorial2"
-elif page_selection == "Test" and st.session_state.user_info_collected:
-    st.session_state.page = "test"
+# if page_selection == "User Info":
+#     st.session_state.page = "user_info"
+# elif page_selection == "Tutorial 1" and st.session_state.user_info_collected:
+#     st.session_state.page = "tutorial1"
+# elif page_selection == "Tutorial 2" and st.session_state.user_info_collected:
+#     st.session_state.page = "tutorial2"
+# elif page_selection == "Test" and st.session_state.user_info_collected:
+#     st.session_state.page = "test"
 
-if st.session_state.page == "user_info":
+print(f"******{st.session_state.page=}")
+if st.session_state.page == "User Info":
     st.write("### Please provide your details before starting the test")
     st.text(f"Your Listener ID: {st.session_state.listener_id}")  # Display auto-generated ID
     st.session_state.age = st.number_input("Enter your age", min_value=10, max_value=100, step=1)
@@ -135,15 +145,27 @@ if st.session_state.page == "user_info":
         st.session_state.user_ratings_file = user_ratings_file  # Store in session
         
         st.session_state.user_info_collected = True
-        st.session_state.page = "tutorial1"  # Move to the first tutorial
+        st.session_state.page = "Tutorial 1"  # Move to the first tutorial
         st.success("Information saved! Proceed to the test.")
         st.rerun()
 
-elif st.session_state.page.startswith("tutorial"):
-    tutorial_index = 0 if st.session_state.page == "tutorial1" else 1
-    source, target, edited = tutorial_questions[tutorial_index]
+elif st.session_state.page.startswith("Tutorial"):
+    # manually encode page-index mapping
+    index_page = {
+        0: 'Tutorial 1',
+        1: 'Tutorial 2'
+        }
 
-    st.write(f"### Tutorial {tutorial_index + 1}: How to Rate")
+    st.session_state.question_type = "tutorial" # for logging
+    # TODO: this only works when there are two questions for tutorial
+    # Need to make it more general
+    # st.session_state.tutorial_index = 0 if st.session_state.page == "tutorial1" else 1
+    # st.session_state.tutorial_index = tutorial_index
+
+    # fetch audio from the list
+    source, target, edited = tutorial_questions[st.session_state.tutorial_index]
+
+    st.write(f"### Tutorial {st.session_state.tutorial_index + 1}: How to Rate")
     st.write(f'Listener ID: {st.session_state.listener_id}')
     col1, col2 = st.columns(2)
     with col1:
@@ -174,14 +196,39 @@ elif st.session_state.page.startswith("tutorial"):
     # score_b = st.button("### Score B", key=f"score_b_{st.session_state.question_index}")
     # score_c = st.button("### Score C", key=f"score_c_{st.session_state.question_index}")
 
+    print(f"======= Before button: {st.session_state.page =}")
     if st.button("Next"): # determines how many tutorials there are
-        if tutorial_index == 0:
-            st.session_state.page = "tutorial2"  # Move to second tutorial
+        # Load existing data
+        user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
+        if not st.session_state.test_completed:
+            # Append a new row if question does not exist
+            new_entry = pd.DataFrame([{
+                "question_type": 'tutorial',
+                "question": st.session_state.tutorial_index,
+                "selection": st.session_state.selected_ratings,
+            }])
+            user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
+
+            # Save back to CSV (overwrite the file)
+            user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)    
+
+        st.session_state.tutorial_index += 1
+        if st.session_state.tutorial_index < len(tutorial_questions):
+            # if there are still tutorial questions
+            st.session_state.page = index_page[st.session_state.tutorial_index]  # Move to next page             
+        elif st.session_state.tutorial_index == len(tutorial_questions):
+            print(f"======= move to test: {st.session_state.tutorial_index=}")
+            st.session_state.page = "Listening test"  # Move to the test
+            print(f"======= move to : {st.session_state.page=}")
         else:
-            st.session_state.page = "test"  # Move to the test
+            raise ValueError('Unexpected case')
+        
+
+           
+        
         st.rerun()
 
-elif st.session_state.page == "test":
+elif st.session_state.page == "Listening test":
     # Show progress bar with clickable selection
     # Show progress as a list of audio files with visual indicators
     # ==== Highlight version ====
@@ -272,7 +319,8 @@ elif st.session_state.page == "test":
             if not st.session_state.test_completed:
                 # Append a new row if question does not exist
                 new_entry = pd.DataFrame([{
-                    "question": st.session_state.question_index,
+                    "question_type": 'test',
+                    "question": st.session_state.test_index,
                     "selection": st.session_state.selected_ratings,
                 }])
                 user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
@@ -280,6 +328,7 @@ elif st.session_state.page == "test":
                 # Save back to CSV (overwrite the file)
                 user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)    
 
+        # Modifying existing data when the test is completed
         if len(st.session_state.ratings) >= len(audio_questions):
             st.session_state.test_completed = True
             finish_time = datetime.datetime.now()

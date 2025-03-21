@@ -8,10 +8,14 @@ import datetime
 ratings_dir = "user_ratings"
 os.makedirs(ratings_dir, exist_ok=True)
 
+# refresh page when clicking on the navigation pane
+def update_page():
+    st.session_state.page = st.session_state.page_selection
+
 # Rating buttons
 def render_rating_buttons(num_buttons, label):
     st.write(f"### {label}")
-    cols = st.columns(num_buttons)
+    cols = st.columns(num_buttons)    
 
     # Determine which index to use for storing ratings
     if st.session_state.question_type == "tutorial":
@@ -108,15 +112,23 @@ st.title("Audio Rating App")
 # Sidebar Navigation
 st.sidebar.title("Navigation")
 page_options = ["User Info", "Tutorial 1", "Tutorial 2", "Listening test"]
+
 # Ensure session state page matches available options
-print(f"Beginning = {st.session_state.page=}")
 # st.session_state.page = valid_page_mapping.get(st.session_state.page, "User Info")  # Default to 'User Info'
-print(f"{st.session_state.page=}")
 current_index = page_options.index(st.session_state.page)
 # Sidebar radio but **DO NOT override manually set page**
-page_selection = st.sidebar.radio("Current progress", page_options, index=current_index)
+# page_selection = st.sidebar.radio("Current progress", page_options, index=current_index)
+page_selection = st.sidebar.radio(
+    "Current progress", 
+    page_options, 
+    index=current_index, 
+    key="page_selection", 
+    on_change=update_page  # Call function when selection changes
+)
 
-print(f"******{st.session_state.page=}")
+# FIX: Make sure session state updates to match user selection
+st.session_state.page = page_selection  # Update session state to match sidebar selection
+
 if st.session_state.page == "User Info":
     st.write("### Please provide your details before starting the test")
     st.text(f"Your Listener ID: {st.session_state.listener_id}")  # Display auto-generated ID
@@ -147,6 +159,9 @@ elif st.session_state.page.startswith("Tutorial"):
         0: 'Tutorial 1',
         1: 'Tutorial 2'
         }
+    reverse_index_page = {v: k for k, v in index_page.items()}
+    # get index from page name
+    st.session_state.tutorial_index = reverse_index_page.get(st.session_state.page, None)    
 
     st.session_state.question_type = "tutorial" # for logging
     # TODO: this only works when there are two questions for tutorial
@@ -180,7 +195,6 @@ elif st.session_state.page.startswith("Tutorial"):
     # create buttons
     render_rating_buttons(2, "Score A")    
 
-    print(f"======= Before button: {st.session_state.page =}")
     if st.button("Next"): # determines how many tutorials there are
         # Load existing data
         user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
@@ -201,9 +215,7 @@ elif st.session_state.page.startswith("Tutorial"):
             # if there are still tutorial questions
             st.session_state.page = index_page[st.session_state.tutorial_index]  # Move to next page             
         elif st.session_state.tutorial_index == len(tutorial_questions):
-            print(f"======= move to test: {st.session_state.tutorial_index=}")
             st.session_state.page = "Listening test"  # Move to the test
-            print(f"======= move to : {st.session_state.page=}")
         else:
             raise ValueError('Unexpected case')
         

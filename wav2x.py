@@ -4,6 +4,7 @@
 
 import os
 import sys
+import shutil
 import torchaudio
 import tqdm
 
@@ -13,18 +14,20 @@ def wav2x(input_folder, output_folder, extension='flac'):
 
     for root, _, files in os.walk(input_folder):
         for file in tqdm.tqdm(files):
+            input_file = os.path.join(root, file)
+            relative_path = os.path.relpath(root, input_folder)
+            output_subfolder = os.path.join(output_folder, relative_path)
+            os.makedirs(output_subfolder, exist_ok=True)
+
             if file.endswith('.wav'):
-                wav_file = os.path.join(root, file)
-
-                # Compute relative path and create corresponding output folder
-                relative_path = os.path.relpath(root, input_folder)
-                output_subfolder = os.path.join(output_folder, relative_path)
-                os.makedirs(output_subfolder, exist_ok=True)
-
-                # Save output file in the corresponding subfolder
-                flac_file = os.path.join(output_subfolder, file.replace('.wav', f'.{extension}'))
-                waveform, sample_rate = torchaudio.load(wav_file)
-                torchaudio.save(flac_file, waveform, sample_rate=sample_rate)
+                # Convert and save as FLAC (or specified format)
+                output_file = os.path.join(output_subfolder, file.replace('.wav', f'.{extension}'))
+                waveform, sample_rate = torchaudio.load(input_file)
+                torchaudio.save(output_file, waveform, sample_rate=sample_rate)
+            else:
+                # Copy non-WAV files as they are
+                output_file = os.path.join(output_subfolder, file)
+                shutil.copy2(input_file, output_file)
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

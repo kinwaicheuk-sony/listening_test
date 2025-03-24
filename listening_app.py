@@ -4,6 +4,7 @@ import os
 import uuid
 import datetime
 import json
+import re
 
 # Directory to store user ratings
 ratings_dir = "user_ratings"
@@ -16,6 +17,13 @@ with open("audio_questions.json", "r") as f:
 tutorial_questions = audio_config["tutorial_questions"]
 audio_questions = audio_config["audio_questions"]
 audio_questions2 = audio_config["audio_questions2"]
+
+# parse target concept from the txt file
+def get_label_from_folder(folder_path):
+    for file in os.listdir(folder_path):
+        if file.endswith(".txt") and "prompt" not in file.lower():
+            return os.path.splitext(file)[0]  # Get filename without extension
+    return None  # Return None if no .txt file is found
 
 # refresh page when clicking on the navigation pane
 def update_page():
@@ -167,7 +175,7 @@ elif st.session_state.page.startswith("Tutorial"):
             Edit 2 changes the melody quite a bit, and it still sounds like piano.  \n\
             Edit 1 is more successful among the two, so you should choose Edit 1.",
         1: "Edit 1 has slightly different melody than the source.  \n\
-            Edit 2 preserves the melody in the source better and sounds more like the instrument in the target.  \n\
+            Edit 2 preserves the melody in the source better and sounds more like the concept in the reference.  \n\
             So edit 2 should be selected."
     }
     titles = {
@@ -209,9 +217,13 @@ elif st.session_state.page.startswith("Tutorial"):
         with col1:
             st.write("#### Source")
             st.audio(file_paths[0], format="audio/flac")
+            st.write("##### source prompt")
+            st.write("A famous classicial music played on a [piano]")
         with col2:
-            st.write("#### Target")
+            st.write("#### Reference: Bouzouki")
             st.audio(file_paths[1], format="audio/flac")
+            st.write("##### Target prompt")
+            st.write("A famous classicial music played on a [bouzouki]")            
         col1, col2 = st.columns(2)
         with col1:
             st.write("#### edited result 1")
@@ -311,6 +323,9 @@ elif st.session_state.page == "Listening test 1":
 
     # Get current question audio files
     audio_files = audio_questions[st.session_state.test_index]
+    # make sure there is no error in sample name
+    assert len(set(os.path.dirname(f) for f in audio_files)) == 1, \
+        "Not all files are in the same directory!"
 
     # Display audio in a grid layout
     st.write(f'Listener ID: {st.session_state.listener_id}')
@@ -435,7 +450,8 @@ elif st.session_state.page == "Listening test 1":
 elif st.session_state.page == "Listening test 2":
     # Show progress bar with clickable selection
     st.write("### Progress")
-    cols = st.columns(len(audio_questions2))  # Adjust column count
+    num_cols = 16
+    cols = st.columns(num_cols)  # Adjust column count
     st.session_state.question_type = 'test2'
 
     for idx in range(len(audio_questions2)):
@@ -449,13 +465,16 @@ elif st.session_state.page == "Listening test 2":
         else:
             status = "⬜"  # Not answered yet
         
-        with cols[idx % 10]:  # Arrange in rows
+        with cols[idx % num_cols]:  # Arrange in rows
             if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):
                 st.session_state.test_index2 = idx
                 st.rerun()
 
     # Get current question audio files
     audio_files = audio_questions2[st.session_state.test_index2]
+    # make sure there is no error in sample name
+    assert len(set(os.path.dirname(f) for f in audio_files)) == 1, \
+        "Not all files are in the same directory!"    
 
     # read txt file
     with open(audio_files[1], "r", encoding="utf-8") as f:
@@ -470,8 +489,11 @@ elif st.session_state.page == "Listening test 2":
         st.write(f"##### source prompt")
         st.write(f"{lines[0]}")
     with col2:
-        st.write("#### target")
+        concept_label = get_label_from_folder(os.path.dirname(audio_files[0]))
+        st.write(f"#### Reference: {concept_label}")
         st.audio(audio_files[2], format="audio/flac")
+        st.write(f"##### target prompt")
+        st.write(re.sub(r'\[.*?\]', f"[{concept_label}]", lines[0]))        
     
     col1, col2 = st.columns(2)
     with col1:
@@ -508,7 +530,7 @@ elif st.session_state.page == "Listening test 2":
     render_rating_buttons(
         2,
         f"Question {st.session_state.test_index2+1}:",
-        "Which editing sounds closer to the instrument in the target audio while maintaining the content in the source audio?")
+        "Which editing sounds closer to the concept in the reference audio while maintaining the content in the source audio?")
 
 
 

@@ -99,7 +99,11 @@ root_directory = Path("SteerMusic_demo_flac")  # Use relative path
 # List of samples to exclude
 exclude_samples = {
     "Sample3", "Sample4", "Sample5", "Sample10",
-    "Sample20", "Sample21"}
+    "Sample11", "Sample19", "Sample20", "Sample21",
+    "Sample22", "Sample24", "Sample25", "Sample26",
+    "Sample27", "Sample28", "Sample29", "Sample31",
+    "Sample32", "Sample33", "Sample34"}
+# sample29 missing reference
 
 # Generate the JSON data
 audio_data = generate_audio_questions(root_directory, selection_control, exclude_samples)

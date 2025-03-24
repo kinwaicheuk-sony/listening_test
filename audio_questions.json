@@ -13,34 +13,44 @@
     ],
     "audio_questions": [
       [
-        "audio/flac/source1.flac",
-        "audio/flac/target1.flac",
-        "audio/flac/edit1_s1_t1.flac"
+        "SteerEdit_demo_flac/Sample1/source.flac",
+        "SteerEdit_demo_flac/Sample1/prompt.txt",
+        "SteerEdit_demo_flac/Sample1/steermusic.flac",
+        "SteerEdit_demo_flac/Sample1/DDIM.flac"
       ],
       [
-        "audio/flac/source1.flac",
-        "audio/flac/target1.flac",
-        "audio/flac/edit2_s1_t1.flac"
+        "SteerEdit_demo_flac/Sample2/source.flac",
+        "SteerEdit_demo_flac/Sample2/prompt.txt",
+        "SteerEdit_demo_flac/Sample2/ZETA.flac",
+        "SteerEdit_demo_flac/Sample2/steermusic.flac"
       ],
       [
-        "audio/flac/source1.flac",
-        "audio/flac/target2.flac",
-        "audio/flac/edit1_s1_t2.flac"
+        "SteerEdit_demo_flac/Sample1/source.flac",
+        "SteerEdit_demo_flac/Sample1/prompt.txt",
+        "SteerEdit_demo_flac/Sample1/steermusic.flac",
+        "SteerEdit_demo_flac/Sample1/musicmagus.flac"
       ],
       [
-        "audio/flac/source1.flac",
-        "audio/flac/target2.flac",
-        "audio/flac/edit2_s1_t2.flac"
-      ],
-      [
-        "audio/flac/source1.flac",
-        "audio/flac/target3.flac",
-        "audio/flac/edit1_s1_t3.flac"
-      ],
-      [
-        "audio/flac/source1.flac",
-        "audio/flac/target3.flac",
-        "audio/flac/edit2_s1_t3.flac"
+        "SteerEdit_demo_flac/Sample2/source.flac",
+        "SteerEdit_demo_flac/Sample2/prompt.txt",
+        "SteerEdit_demo_flac/Sample2/steermusic.flac",
+        "SteerEdit_demo_flac/Sample2/musicmagus.flac"
       ]
+    ],
+  "audio_questions2": [
+    [
+      "SteerMusic_demo_flac/Sample1/Source.flac",
+      "SteerMusic_demo_flac/Sample1/source_prompt.txt",
+      "SteerMusic_demo_flac/Sample1/bouzouki_1.flac",
+      "SteerMusic_demo_flac/Sample1/0bP2MH3LqvI_SteerMusic.flac",
+      "SteerMusic_demo_flac/Sample1/0bP2MH3LqvI_Textinv.flac"
+    ],
+    [
+      "SteerMusic_demo_flac/Sample2/Source.flac",
+      "SteerMusic_demo_flac/Sample2/source_prompt.txt",
+      "SteerMusic_demo_flac/Sample2/bouzouki_1.flac",
+      "SteerMusic_demo_flac/Sample2/-5xOcMJpTUk_SteerMusic.flac",
+      "SteerMusic_demo_flac/Sample2/-5xOcMJpTUk_DreamSound.flac"
     ]
-  }
+  ]
+}

@@ -284,21 +284,32 @@ elif st.session_state.page == "Listening test 1":
 
     # Display audio in a grid layout
     st.write(f'Listener ID: {st.session_state.listener_id}')
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write("#### source")
-        st.audio(audio_files[0], format="audio/flac")
-    with col2:
-        st.write("#### target")
-        st.audio(audio_files[1], format="audio/flac")
+    # col1, col2 = st.columns(2)
+    # with col1:
+    #     st.write("#### source")
+    #     st.audio(audio_files[0], format="audio/flac")
+    # with col2:
+    #     st.write("#### target")
+    #     st.audio(audio_files[1], format="audio/flac")
+    st.write("#### source")
+    st.audio(audio_files[0], start_time=0, format="audio/flac")
+
+    # read txt file
+    with open(audio_files[1], "r", encoding="utf-8") as f:
+        lines = [line.strip() for line in f if line.strip()]  # Remove empty lines and strip whitespace
+
+    st.write("##### source prompt")        
+    st.write(lines[1])
+    st.write("##### target prompt")        
+    st.write(lines[2])
     
     col1, col2 = st.columns(2)
     with col1:
         st.write("#### edited result 1")
-        st.audio(audio_files[0], format="audio/flac")
+        st.audio(audio_files[2], format="audio/flac")
     with col2:
         st.write("#### edited result 2")
-        st.audio(audio_files[1], format="audio/flac")
+        st.audio(audio_files[3], format="audio/flac")
 
     # Dislay this message when the test is completed
     if st.session_state.test_completed:
@@ -313,7 +324,7 @@ elif st.session_state.page == "Listening test 1":
     render_rating_buttons(
         2,
         f"Question {st.session_state.test_index+1}:",
-        "which editing is more successful?")
+        "Which editing keeps the same melody as in the source while changing the instrument more successfully?")
 
 
 
@@ -400,23 +411,29 @@ elif st.session_state.page == "Listening test 2":
     # Get current question audio files
     audio_files = audio_questions2[st.session_state.test_index2]
 
+    # read txt file
+    with open(audio_files[1], "r", encoding="utf-8") as f:
+        lines = [line.strip() for line in f if line.strip()]  # Remove empty lines and strip whitespace    
+
     # Display audio in a grid layout
     st.write(f'Listener ID: {st.session_state.listener_id}')
     col1, col2 = st.columns(2)
     with col1:
         st.write("#### source")
         st.audio(audio_files[0], format="audio/flac")
+        st.write(f"##### source prompt")
+        st.write(f"{lines[0]}")
     with col2:
         st.write("#### target")
-        st.audio(audio_files[1], format="audio/flac")
+        st.audio(audio_files[2], format="audio/flac")
     
     col1, col2 = st.columns(2)
     with col1:
         st.write("#### edited result 1")
-        st.audio(audio_files[0], format="audio/flac")
+        st.audio(audio_files[3], format="audio/flac")
     with col2:
         st.write("#### edited result 2")
-        st.audio(audio_files[1], format="audio/flac")
+        st.audio(audio_files[4], format="audio/flac")
 
     # Dislay this message when the test is completed
     if (st.session_state.test_completed!=True) and st.session_state.test_completed2:
@@ -435,7 +452,7 @@ elif st.session_state.page == "Listening test 2":
     render_rating_buttons(
         2,
         f"Question {st.session_state.test_index2+1}:",
-        "which editing is more successful?")
+        "Which editing sounds closer to the instrument in the target audio while maintaining the content in the source audio?")
 
 
 

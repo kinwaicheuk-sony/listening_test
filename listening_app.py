@@ -303,7 +303,8 @@ elif st.session_state.page.startswith("Tutorial"):
 elif st.session_state.page == "Listening test 1":
     # Show progress bar with clickable selection
     st.write("### Progress")
-    cols = st.columns(len(audio_questions))  # Adjust column count
+    num_cols = 20
+    cols = st.columns(num_cols)  # Adjust column count
     st.session_state.question_type = 'test1'
     for idx in range(len(audio_questions)):
         completed = idx in st.session_state.ratings  # Check if the question has been rated
@@ -316,7 +317,7 @@ elif st.session_state.page == "Listening test 1":
         else:
             status = "⬜"  # Not answered yet
         
-        with cols[idx % 10]:  # Arrange in rows
+        with cols[idx % num_cols]:  # Arrange in rows
             if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):
                 st.session_state.test_index = idx
                 st.rerun()

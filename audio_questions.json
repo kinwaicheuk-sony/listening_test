@@ -2,13 +2,14 @@
     "tutorial_questions": [
       [
         "audio/flac/source1.flac",
-        "audio/flac/source1.flac",
-        "audio/flac/source1.flac"
+        "audio/flac/edit2_s1_t2.flac",
+        "audio/flac/edit1_s1_t2.flac"
       ],
       [
         "audio/flac/source1.flac",
         "audio/flac/target1.flac",
-        "audio/flac/target1.flac"
+        "audio/flac/edit1_s1_t1.flac",
+        "audio/flac/edit2_s1_t1.flac"
       ]
     ],
     "audio_questions": [

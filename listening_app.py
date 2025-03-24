@@ -90,7 +90,7 @@ st.title("Audio Rating App")
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
-page_options = ["User Info", "Tutorial 1", "Tutorial 2", "Listening test 1", "Listening test 2"]
+page_options = ["User Info", "Tutorial 1", "Listening test 1", "Tutorial 2",  "Listening test 2"]
 
 # Ensure session state page matches available options
 # st.session_state.page = valid_page_mapping.get(st.session_state.page, "User Info")  # Default to 'User Info'
@@ -108,7 +108,7 @@ page_selection = st.sidebar.radio(
 # FIX: Make sure session state updates to match user selection
 st.session_state.page = page_selection  # Update session state to match sidebar selection
 
-if st.session_state.page == "User Info":
+if st.session_state.page == "User Info": 
     st.write("### Please provide your details before starting the test")
     st.text(f"Your Listener ID: {st.session_state.listener_id}")  # Display auto-generated ID
     st.session_state.age = st.number_input("Enter your age", min_value=18, max_value=100, step=1)
@@ -276,9 +276,11 @@ elif st.session_state.page.startswith("Tutorial"):
             st.session_state.tutorial_index += 1
             if st.session_state.tutorial_index < len(tutorial_questions):
                 # if there are still tutorial questions
-                st.session_state.page = index_page[st.session_state.tutorial_index]  # Move to next page             
+                # st.session_state.page = index_page[st.session_state.tutorial_index]  # Move to next page
+                st.session_state.page = "Listening test 1"  # Go to test1 after tutorial 1   
             elif st.session_state.tutorial_index == len(tutorial_questions):
-                st.session_state.page = "Listening test 1"  # Move to the test
+                # st.session_state.page = "Listening test 1"  # Move to the test
+                st.session_state.page = "Listening test 2"  # Keep tutorial 2 leading to test2                
             else:
                 raise ValueError('Unexpected case')
             
@@ -291,7 +293,6 @@ elif st.session_state.page == "Listening test 1":
     st.write("### Progress")
     cols = st.columns(len(audio_questions))  # Adjust column count
     st.session_state.question_type = 'test1'
-
     for idx in range(len(audio_questions)):
         completed = idx in st.session_state.ratings  # Check if the question has been rated
         is_current = idx == st.session_state.test_index  # Check if it's the current question
@@ -341,9 +342,24 @@ elif st.session_state.page == "Listening test 1":
         st.audio(audio_files[3], format="audio/flac")
 
     # Dislay this message when the test is completed
-    if st.session_state.test_completed:
-        st.write("### Thank you for completing part 1 of the test!")
-        st.write("#### You can review/edit your ratings in this part")      
+    # if st.session_state.test_completed:
+    #     st.success("### Thank you for completing part 1 of the test!")
+    #     st.success("#### You can review/edit your ratings in this part")      
+    if (st.session_state.test_completed2!=True) and st.session_state.test_completed:
+        st.success(
+            """
+            #### Thank you for completing part 1 of the test!  
+            ##### You can review/edit your ratings in this part.
+            """
+        )
+    elif (st.session_state.test_completed2==True) and st.session_state.test_completed:
+        st.success(
+            """
+            #### Thank you for completing everything!  
+            ##### You can close the browser now.  
+            ##### Or you can review/edit your ratings by clicking the progress bar
+            """
+        )        
     
     # Collect ratings
     default_ratings = st.session_state.ratings.get(st.session_state.test_index, [3, 3, 3])
@@ -383,7 +399,8 @@ elif st.session_state.page == "Listening test 1":
             # Modifying existing data when the test is completed
             if len(st.session_state.ratings) >= len(audio_questions):
                 st.session_state.test_completed = True
-                st.session_state.page = "Listening test 2"  # Move to the test           
+                # st.session_state.page = "Listening test 2"  # Move to the test      
+                st.session_state.page = "Tutorial 2"  # Move to tutorial 2 instead of test2     
                 finish_time = datetime.datetime.now()
 
                 # Load existing data
@@ -466,12 +483,22 @@ elif st.session_state.page == "Listening test 2":
 
     # Dislay this message when the test is completed
     if (st.session_state.test_completed!=True) and st.session_state.test_completed2:
-        st.write("### Thank you for completing part 2 of the test!")
-        st.write("#### Or you can review/edit your ratings in this part")
+        st.success(
+            """
+            #### Thank you for completing part 2 of the test!  
+            ##### You can review/edit your ratings in this part.
+            """
+        )
     elif (st.session_state.test_completed==True) and st.session_state.test_completed2:
-        st.write("### Thank you for completing everything!")
-        st.write("#### You can close the browser now.")
-        st.write("#### Or you can review/edit your ratings by clicking the progress bar")
+        st.success(
+            """
+            #### Thank you for completing everything!  
+            ##### You can close the browser now.  
+            ##### Or you can review/edit your ratings by clicking the progress bar
+            """
+        )
+        # st.success("#### You can close the browser now.")
+        # st.success("#### Or you can review/edit your ratings by clicking the progress bar"
 
     # Collect ratings
     default_ratings = st.session_state.ratings2.get(st.session_state.test_index2, [3, 3, 3])

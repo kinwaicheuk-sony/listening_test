@@ -162,8 +162,17 @@ elif st.session_state.page.startswith("Tutorial"):
         1: 'Tutorial 2'
         }
     instructions = {
-        0: 'edit 1 preserves the melody in the source better and sounds more like the instrument in the target, so edit 1 should be selected.',
-        1: 'edit 2 preserves the melody in the source better and sounds more like the instrument in the target, so edit 2 should be selected.'
+        0: "Edit 1 preserves the melody in the source better. \
+            Although it doesn't  sounds exactly like flute, it sounds more or less woodwind instrument.  \n\
+            Edit 2 changes the melody quite a bit, and it still sounds like piano.  \n\
+            Edit 1 is more successful among the two, so you should choose Edit 1.",
+        1: "Edit 1 has slightly different melody than the source.  \n\
+            Edit 2 preserves the melody in the source better and sounds more like the instrument in the target.  \n\
+            So edit 2 should be selected."
+    }
+    titles = {
+        0: 'Text-based editing',
+        1: 'Reference-based editing'
     }
     reverse_index_page = {v: k for k, v in index_page.items()}
     # get index from page name
@@ -176,27 +185,47 @@ elif st.session_state.page.startswith("Tutorial"):
     # st.session_state.tutorial_index = tutorial_index
 
     # fetch audio from the list
-    source, target, edited = tutorial_questions[st.session_state.tutorial_index]
+    # source, target, edited = tutorial_questions[st.session_state.tutorial_index]
+    file_paths = tutorial_questions[st.session_state.tutorial_index]
 
-    st.write(f"#### Tutorial {st.session_state.tutorial_index + 1}: How to Rate")
+    st.write(f"#### Tutorial {st.session_state.tutorial_index + 1}: {titles[st.session_state.tutorial_index]}")
     st.write(f'Listener ID: {st.session_state.listener_id}')
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write("#### Source")
-        st.audio(source, format="audio/flac")
-    with col2:
-        st.write("#### Target")
-        st.audio(target, format="audio/flac")
+    if st.session_state.tutorial_index == 0:
+        st.write("#### source")
+        st.audio(file_paths[0], start_time=0, format="audio/flac")
+        st.write("##### source prompt")        
+        st.write("A famous classicial music played on a [piano]")
+        st.write("##### target prompt")        
+        st.write("A famous classicial music played on a [flute]")   
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write("#### edited result 1")
+            st.audio(file_paths[1], format="audio/flac")
+        with col2:
+            st.write("#### edited result 2")
+            st.audio(file_paths[2], format="audio/flac")             
+    elif st.session_state.tutorial_index == 1:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write("#### Source")
+            st.audio(file_paths[0], format="audio/flac")
+        with col2:
+            st.write("#### Target")
+            st.audio(file_paths[1], format="audio/flac")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write("#### edited result 1")
+            st.audio(file_paths[2], format="audio/flac")
+        with col2:
+            st.write("#### edited result 2")
+            st.audio(file_paths[3], format="audio/flac")                
+    else:
+        raise ValueError('Case not considered')
+
 
     # st.write("### Edited Result")
     # st.audio(edited, format="audio/flac")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write("#### edited result 1")
-        st.audio(edited, format="audio/flac")
-    with col2:
-        st.write("#### edited result 2")
-        st.audio(edited, format="audio/flac")    
+
 
     # create buttons
     render_rating_buttons(

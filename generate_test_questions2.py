@@ -32,6 +32,7 @@ def get_ordered_files(sample_path, allowed_types):
     """ Get ordered files for a sample folder, filtering based on allowed_types """
     files = {pattern: [] for pattern in EXPECTED_ORDER}  # Dict to store categorized files
     selected_audio_files = []  # Store the selected two audio files
+    numbered_flac_files = []  # Store any *_X.flac files (where X is a digit)
 
     # Sort and categorize files
     for file in sample_path.glob("*"):
@@ -39,33 +40,46 @@ def get_ordered_files(sample_path, allowed_types):
             continue  # Ignore non-audio/non-text files
 
         filename_lower = file.name.lower()  # Convert to lowercase for matching
+
+        # Match dynamically named numbered flac files (e.g., bouzouki_1.flac, violin_2.flac)
+        if re.match(r".*_\d\.flac$", filename_lower):
+            numbered_flac_files.append(file)
+            continue  # Skip explicit checks in EXPECTED_ORDER
+
         for pattern in EXPECTED_ORDER:
             if pattern == filename_lower or (pattern.startswith("*") and filename_lower.endswith(pattern[1:])):
                 files[pattern].append(file)
 
     # Flatten list while keeping order, but filtering .flac files properly
     ordered_files = []
+    
+    # First, add source files and prompt
     for pattern in EXPECTED_ORDER:
-        if pattern in ["*_steermusic.flac", "*_textinv.flac", "*_dreamsound.flac"]:  
-            audio_type = pattern.split("_")[-1].replace(".flac", "")  # Extract audio type (steermusic, textinv, dreamsound)
-            if AUDIO_TYPE_MAP[audio_type] in allowed_types:
-                selected_audio_files.append(files[pattern][0])  # Add the first match
+        if pattern in ["source.flac", "source_prompt.txt"]:
+            ordered_files.extend(sorted(files[pattern]))  # Add as normal
 
-        elif pattern in files:  
-            ordered_files.extend(sorted(files[pattern]))  # Add all other files as normal
+    # Then, add *_X.flac files (sorted naturally)
+    ordered_files.extend(sorted(numbered_flac_files, key=lambda x: natural_sort_key(x.name)))
+
+    # Then, add the selected audio type files based on `allowed_types`
+    for pattern in ["*_steermusic.flac", "*_textinv.flac", "*_dreamsound.flac"]:
+        audio_type = pattern.split("_")[-1].replace(".flac", "")  # Extract audio type
+        if AUDIO_TYPE_MAP[audio_type] in allowed_types and files[pattern]:
+            selected_audio_files.append(files[pattern][0])  # Add the first match
 
     # **Sort selected .flac files based on allowed_types order**
     selected_audio_files.sort(key=lambda x: allowed_types.index(AUDIO_TYPE_MAP[x.stem.split("_")[-1].lower()]))
 
     return [str(file.relative_to(sample_path.parent)) for file in ordered_files + selected_audio_files]  # Keep relative paths
 
-def generate_audio_questions(root_dir, selection_control):
+def generate_audio_questions(root_dir, selection_control, exclude_samples):
     """ Generate JSON with ordered audio file paths based on selection_control """
     data = {"audio_questions2": []}
 
     # Sort sample folders naturally (Sample1, Sample2, ..., Sample35)
     sample_folders = sorted(
-        [f for f in root_dir.iterdir() if f.is_dir() and f.name.startswith("Sample")],
+        [f for f in root_dir.iterdir() 
+         if f.is_dir() and f.name.startswith("Sample") and f.name not in exclude_samples],
         key=lambda x: natural_sort_key(x.name)
     )
 
@@ -73,15 +87,22 @@ def generate_audio_questions(root_dir, selection_control):
         allowed_types = selection_control[idx % len(selection_control)]  # Cycle through selection control list
         ordered_files = get_ordered_files(sample_folder, allowed_types)
         if ordered_files:
-            data["audio_questions2"].append(ordered_files)
+            # Adjust paths to include the root directory
+            data["audio_questions2"].append([str(root_dir / Path(file)) for file in ordered_files])
 
     return data
+
 
 # Set root directory where "SampleXX" folders are located
 root_directory = Path("SteerMusic_demo_flac")  # Use relative path
 
+# List of samples to exclude
+exclude_samples = {
+    "Sample3", "Sample4", "Sample5", "Sample10",
+    "Sample20", "Sample21"}
+
 # Generate the JSON data
-audio_data = generate_audio_questions(root_directory, selection_control)
+audio_data = generate_audio_questions(root_directory, selection_control, exclude_samples)
 
 # Save to a JSON file
 output_path = "audio_questions2.json"

@@ -11,7 +11,7 @@ AUDIO_TYPE_MAP = {
 
 # Control which audio types appear per sample
 selection_control = [
-    [0, 1], [2, 0], [1,0], [0, 2]
+    [0, 1], [2, 0]
     ]  # Modify this to change the selection pattern
 
 # Expected order
@@ -84,11 +84,11 @@ def generate_audio_questions(root_dir, selection_control, exclude_samples):
     )
 
     for idx, sample_folder in enumerate(sample_folders):
-        allowed_types = selection_control[idx % len(selection_control)]  # Cycle through selection control list
-        ordered_files = get_ordered_files(sample_folder, allowed_types)
-        if ordered_files:
-            # Adjust paths to include the root directory
-            data["audio_questions2"].append([str(root_dir / Path(file)) for file in ordered_files])
+        for selection in selection_control:  # Iterate over all selection patterns
+            ordered_files = get_ordered_files(sample_folder, selection)
+            if ordered_files:
+                # Adjust paths to include the root directory
+                data["audio_questions2"].append([str(root_dir / Path(file)) for file in ordered_files])
 
     return data
 
@@ -98,8 +98,9 @@ root_directory = Path("SteerMusic_demo_flac")  # Use relative path
 
 # List of samples to exclude
 exclude_samples = {
-    "Sample3", "Sample4", "Sample5", "Sample10",
-    "Sample11", "Sample19", "Sample20", "Sample21",
+    "Sample1", "Sample3", "Sample4", "Sample5",
+    "Sample6", "Sample10", "Sample11", "Sample12",
+    "Sample13", "Sample14", "Sample15", "Sample19", "Sample20", "Sample21",
     "Sample22", "Sample24", "Sample25", "Sample26",
     "Sample27", "Sample28", "Sample29", "Sample31",
     "Sample32", "Sample33", "Sample34"}

@@ -451,7 +451,7 @@ elif st.session_state.page == "Listening test 1":
 elif st.session_state.page == "Listening test 2":
     # Show progress bar with clickable selection
     st.write("### Progress")
-    num_cols = 16
+    num_cols = 20
     cols = st.columns(num_cols)  # Adjust column count
     st.session_state.question_type = 'test2'
 

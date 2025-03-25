@@ -51,7 +51,7 @@ def render_rating_buttons(num_buttons, label, instruction):
     selected_option = st.radio(
         f" {instruction}",
         options=list(range(num_buttons)),
-        format_func=lambda x: f"Edit {x + 1}",
+        format_func=lambda x: f"edited result {x + 1}",
         index=previous_selection if previous_selection is not None else None,
         key=f"radio_{label}"
     )

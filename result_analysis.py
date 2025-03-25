@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+import os
 
 # Generalized function to handle questions with two baselines
 # Generalized function to handle questions with multiple items and case insensitivity
@@ -16,8 +17,8 @@ def calculate_win_rate_for_dds(questions, selections, baseline_1_name, baseline_
 
     for i, q in enumerate(questions):
         # Extract the last two models for comparison
-        model_3 = q[-2].lower()  # Second last item in the list, convert to lowercase
-        model_4 = q[-1].lower()  # Last item in the list, convert to lowercase
+        model_3 = os.path.basename(q[-2].lower())  # Second last item in the list, convert to lowercase
+        model_4 = os.path.basename(q[-1].lower())  # Last item in the list, convert to lowercase
         choice = selections[i]  # User selection
 
         # Check if dds is present in one of the two models
@@ -63,7 +64,7 @@ with open('audio_questions1.json') as f:
 with open('audio_questions2.json') as f:
     question_list2 = json.load(f)
 
-data = pd.read_csv('user_ratings/dde16a62.csv')
+data = pd.read_csv('user_ratings/d61480e7.csv')
 
 # part 1
 selections = get_partial_answer(data, 'test1')['selection'].values

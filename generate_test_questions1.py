@@ -1,5 +1,6 @@
 import json
 import re
+import random
 from pathlib import Path
 
 # Assign numbers to audio types
@@ -12,9 +13,7 @@ AUDIO_TYPE_MAP = {
 }
 
 # Control which audio types appear per sample
-selection_control = [
-    [0,2], [4,0]
-    ]  # Modify this to change the selection pattern
+selection_control = [[0, 2], [4, 0]]  # Modify this to change the selection pattern
 
 # Expected order
 EXPECTED_ORDER = [
@@ -27,9 +26,11 @@ EXPECTED_ORDER = [
     "zeta.flac",
 ]
 
+
 def natural_sort_key(text):
     """ Extract numbers from text for proper numerical sorting (Sample1, Sample2, ..., Sample35) """
     return [int(t) if t.isdigit() else t for t in re.split(r'(\d+)', text)]
+
 
 def get_ordered_files(sample_path, allowed_types):
     """ Get ordered files for a sample folder, filtering based on allowed_types """
@@ -55,7 +56,7 @@ def get_ordered_files(sample_path, allowed_types):
 
     # Flatten list while keeping order, but filtering .flac files properly
     ordered_files = []
-    
+
     # First, add source files and prompt
     for pattern in EXPECTED_ORDER:
         if pattern in ["source.flac", "prompt.txt"]:
@@ -65,7 +66,7 @@ def get_ordered_files(sample_path, allowed_types):
     ordered_files.extend(sorted(numbered_flac_files, key=lambda x: natural_sort_key(x.name)))
 
     # Then, add the selected audio type files based on `allowed_types`
-    for pattern in ["dds.flac","ddim.flac","musicmagus.flac","sdedit.flac","zeta.flac"]:
+    for pattern in ["dds.flac", "ddim.flac", "musicmagus.flac", "sdedit.flac", "zeta.flac"]:
         audio_type = pattern.split("_")[-1].replace(".flac", "")  # Extract audio type
         if AUDIO_TYPE_MAP[audio_type] in allowed_types and files[pattern]:
             selected_audio_files.append(files[pattern][0])  # Add the first match
@@ -75,8 +76,9 @@ def get_ordered_files(sample_path, allowed_types):
 
     return [str(file.relative_to(sample_path.parent)) for file in ordered_files + selected_audio_files]  # Keep relative paths
 
-def generate_audio_questions(root_dir, selection_control, exclude_samples):
-    """ Generate JSON with ordered audio file paths based on selection_control """
+
+def generate_audio_questions(root_dir, selection_control, exclude_samples, shuffle_order):
+    """ Generate JSON with ordered audio file paths based on selection_control and apply shuffling """
     data = {"audio_questions2": []}
 
     # Sort sample folders naturally (Sample1, Sample2, ..., Sample35)
@@ -92,6 +94,12 @@ def generate_audio_questions(root_dir, selection_control, exclude_samples):
             if ordered_files:
                 # Adjust paths to include the root directory
                 data["audio_questions2"].append([str(root_dir / Path(file)) for file in ordered_files])
+
+    # Apply shuffling based on shuffle_order
+    if len(shuffle_order) == len(data["audio_questions2"]):
+        data["audio_questions2"] = [data["audio_questions2"][i] for i in shuffle_order]
+    else:
+        print("Warning: Shuffle list does not match the number of questions. Skipping shuffle.")
 
     return data
 
@@ -110,10 +118,13 @@ exclude_samples = {
     "Sample34", "Sample35", "Sample36", "Sample37",
     "Sample38", "Sample39", "Sample30", "Sample22",
 }
-# sample18 musicmagus is better
 
-# Generate the JSON data
-audio_data = generate_audio_questions(root_directory, selection_control, exclude_samples)
+# Predefined shuffle order
+shuffled_question_numbers = [12, 3, 7, 1, 9, 18, 4, 0, 15, 6, 2, 5, 19, 8, 14, 11, 17, 10, 16, 13]
+
+# sample18 musicmagus is better
+# Generate the JSON data with shuffling
+audio_data = generate_audio_questions(root_directory, selection_control, exclude_samples, shuffled_question_numbers)
 
 # Save to a JSON file
 output_path = "audio_questions1.json"

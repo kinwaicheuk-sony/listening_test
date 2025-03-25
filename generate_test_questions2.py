@@ -72,7 +72,7 @@ def get_ordered_files(sample_path, allowed_types):
 
     return [str(file.relative_to(sample_path.parent)) for file in ordered_files + selected_audio_files]  # Keep relative paths
 
-def generate_audio_questions(root_dir, selection_control, exclude_samples):
+def generate_audio_questions(root_dir, selection_control, exclude_samples, shuffle_order):
     """ Generate JSON with ordered audio file paths based on selection_control """
     data = {"audio_questions2": []}
 
@@ -90,6 +90,12 @@ def generate_audio_questions(root_dir, selection_control, exclude_samples):
                 # Adjust paths to include the root directory
                 data["audio_questions2"].append([str(root_dir / Path(file)) for file in ordered_files])
 
+    # Apply shuffling based on shuffle_order
+    if len(shuffle_order) == len(data["audio_questions2"]):
+        data["audio_questions2"] = [data["audio_questions2"][i] for i in shuffle_order]
+    else:
+        print("Warning: Shuffle list does not match the number of questions. Skipping shuffle.")
+
     return data
 
 
@@ -106,8 +112,11 @@ exclude_samples = {
     "Sample32", "Sample33", "Sample34"}
 # sample29 missing reference
 
+# Predefined shuffle order
+shuffled_question_numbers = [12, 3, 7, 1, 9, 18, 4, 0, 15, 6, 2, 5, 19, 8, 14, 11, 17, 10, 16, 13]
+
 # Generate the JSON data
-audio_data = generate_audio_questions(root_directory, selection_control, exclude_samples)
+audio_data = generate_audio_questions(root_directory, selection_control, exclude_samples, shuffled_question_numbers)
 
 # Save to a JSON file
 output_path = "audio_questions2.json"

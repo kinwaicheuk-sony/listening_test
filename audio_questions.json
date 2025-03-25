@@ -14,22 +14,10 @@
     ],
     "audio_questions": [
         [
-            "SteerEdit_demo_flac/Sample1/source.flac",
-            "SteerEdit_demo_flac/Sample1/prompt.txt",
-            "SteerEdit_demo_flac/Sample1/dds.flac",
-            "SteerEdit_demo_flac/Sample1/musicmagus.flac"
-        ],
-        [
-            "SteerEdit_demo_flac/Sample1/source.flac",
-            "SteerEdit_demo_flac/Sample1/prompt.txt",
-            "SteerEdit_demo_flac/Sample1/ZETA.flac",
-            "SteerEdit_demo_flac/Sample1/dds.flac"
-        ],
-        [
-            "SteerEdit_demo_flac/Sample5/source.flac",
-            "SteerEdit_demo_flac/Sample5/prompt.txt",
-            "SteerEdit_demo_flac/Sample5/dds.flac",
-            "SteerEdit_demo_flac/Sample5/musicmagus.flac"
+            "SteerEdit_demo_flac/Sample18/source.flac",
+            "SteerEdit_demo_flac/Sample18/prompt.txt",
+            "SteerEdit_demo_flac/Sample18/dds.flac",
+            "SteerEdit_demo_flac/Sample18/musicmagus.flac"
         ],
         [
             "SteerEdit_demo_flac/Sample5/source.flac",
@@ -38,34 +26,16 @@
             "SteerEdit_demo_flac/Sample5/dds.flac"
         ],
         [
-            "SteerEdit_demo_flac/Sample6/source.flac",
-            "SteerEdit_demo_flac/Sample6/prompt.txt",
-            "SteerEdit_demo_flac/Sample6/dds.flac",
-            "SteerEdit_demo_flac/Sample6/musicmagus.flac"
-        ],
-        [
-            "SteerEdit_demo_flac/Sample6/source.flac",
-            "SteerEdit_demo_flac/Sample6/prompt.txt",
-            "SteerEdit_demo_flac/Sample6/ZETA.flac",
-            "SteerEdit_demo_flac/Sample6/dds.flac"
-        ],
-        [
-            "SteerEdit_demo_flac/Sample8/source.flac",
-            "SteerEdit_demo_flac/Sample8/prompt.txt",
-            "SteerEdit_demo_flac/Sample8/dds.flac",
-            "SteerEdit_demo_flac/Sample8/musicmagus.flac"
-        ],
-        [
             "SteerEdit_demo_flac/Sample8/source.flac",
             "SteerEdit_demo_flac/Sample8/prompt.txt",
             "SteerEdit_demo_flac/Sample8/ZETA.flac",
             "SteerEdit_demo_flac/Sample8/dds.flac"
         ],
         [
-            "SteerEdit_demo_flac/Sample16/source.flac",
-            "SteerEdit_demo_flac/Sample16/prompt.txt",
-            "SteerEdit_demo_flac/Sample16/dds.flac",
-            "SteerEdit_demo_flac/Sample16/musicmagus.flac"
+            "SteerEdit_demo_flac/Sample1/source.flac",
+            "SteerEdit_demo_flac/Sample1/prompt.txt",
+            "SteerEdit_demo_flac/Sample1/ZETA.flac",
+            "SteerEdit_demo_flac/Sample1/dds.flac"
         ],
         [
             "SteerEdit_demo_flac/Sample16/source.flac",
@@ -74,34 +44,22 @@
             "SteerEdit_demo_flac/Sample16/dds.flac"
         ],
         [
-            "SteerEdit_demo_flac/Sample17/source.flac",
-            "SteerEdit_demo_flac/Sample17/prompt.txt",
-            "SteerEdit_demo_flac/Sample17/dds.flac",
-            "SteerEdit_demo_flac/Sample17/musicmagus.flac"
+            "SteerEdit_demo_flac/Sample27/source.flac",
+            "SteerEdit_demo_flac/Sample27/prompt.txt",
+            "SteerEdit_demo_flac/Sample27/dds.flac",
+            "SteerEdit_demo_flac/Sample27/musicmagus.flac"
         ],
         [
-            "SteerEdit_demo_flac/Sample17/source.flac",
-            "SteerEdit_demo_flac/Sample17/prompt.txt",
-            "SteerEdit_demo_flac/Sample17/ZETA.flac",
-            "SteerEdit_demo_flac/Sample17/dds.flac"
+            "SteerEdit_demo_flac/Sample6/source.flac",
+            "SteerEdit_demo_flac/Sample6/prompt.txt",
+            "SteerEdit_demo_flac/Sample6/dds.flac",
+            "SteerEdit_demo_flac/Sample6/musicmagus.flac"
         ],
         [
-            "SteerEdit_demo_flac/Sample18/source.flac",
-            "SteerEdit_demo_flac/Sample18/prompt.txt",
-            "SteerEdit_demo_flac/Sample18/dds.flac",
-            "SteerEdit_demo_flac/Sample18/musicmagus.flac"
-        ],
-        [
-            "SteerEdit_demo_flac/Sample18/source.flac",
-            "SteerEdit_demo_flac/Sample18/prompt.txt",
-            "SteerEdit_demo_flac/Sample18/ZETA.flac",
-            "SteerEdit_demo_flac/Sample18/dds.flac"
-        ],
-        [
-            "SteerEdit_demo_flac/Sample19/source.flac",
-            "SteerEdit_demo_flac/Sample19/prompt.txt",
-            "SteerEdit_demo_flac/Sample19/dds.flac",
-            "SteerEdit_demo_flac/Sample19/musicmagus.flac"
+            "SteerEdit_demo_flac/Sample1/source.flac",
+            "SteerEdit_demo_flac/Sample1/prompt.txt",
+            "SteerEdit_demo_flac/Sample1/dds.flac",
+            "SteerEdit_demo_flac/Sample1/musicmagus.flac"
         ],
         [
             "SteerEdit_demo_flac/Sample19/source.flac",
@@ -110,10 +68,46 @@
             "SteerEdit_demo_flac/Sample19/dds.flac"
         ],
         [
-            "SteerEdit_demo_flac/Sample23/source.flac",
-            "SteerEdit_demo_flac/Sample23/prompt.txt",
-            "SteerEdit_demo_flac/Sample23/dds.flac",
-            "SteerEdit_demo_flac/Sample23/musicmagus.flac"
+            "SteerEdit_demo_flac/Sample8/source.flac",
+            "SteerEdit_demo_flac/Sample8/prompt.txt",
+            "SteerEdit_demo_flac/Sample8/dds.flac",
+            "SteerEdit_demo_flac/Sample8/musicmagus.flac"
+        ],
+        [
+            "SteerEdit_demo_flac/Sample5/source.flac",
+            "SteerEdit_demo_flac/Sample5/prompt.txt",
+            "SteerEdit_demo_flac/Sample5/dds.flac",
+            "SteerEdit_demo_flac/Sample5/musicmagus.flac"
+        ],
+        [
+            "SteerEdit_demo_flac/Sample6/source.flac",
+            "SteerEdit_demo_flac/Sample6/prompt.txt",
+            "SteerEdit_demo_flac/Sample6/ZETA.flac",
+            "SteerEdit_demo_flac/Sample6/dds.flac"
+        ],
+        [
+            "SteerEdit_demo_flac/Sample27/source.flac",
+            "SteerEdit_demo_flac/Sample27/prompt.txt",
+            "SteerEdit_demo_flac/Sample27/ZETA.flac",
+            "SteerEdit_demo_flac/Sample27/dds.flac"
+        ],
+        [
+            "SteerEdit_demo_flac/Sample16/source.flac",
+            "SteerEdit_demo_flac/Sample16/prompt.txt",
+            "SteerEdit_demo_flac/Sample16/dds.flac",
+            "SteerEdit_demo_flac/Sample16/musicmagus.flac"
+        ],
+        [
+            "SteerEdit_demo_flac/Sample19/source.flac",
+            "SteerEdit_demo_flac/Sample19/prompt.txt",
+            "SteerEdit_demo_flac/Sample19/dds.flac",
+            "SteerEdit_demo_flac/Sample19/musicmagus.flac"
+        ],
+        [
+            "SteerEdit_demo_flac/Sample17/source.flac",
+            "SteerEdit_demo_flac/Sample17/prompt.txt",
+            "SteerEdit_demo_flac/Sample17/ZETA.flac",
+            "SteerEdit_demo_flac/Sample17/dds.flac"
         ],
         [
             "SteerEdit_demo_flac/Sample23/source.flac",
@@ -122,39 +116,31 @@
             "SteerEdit_demo_flac/Sample23/dds.flac"
         ],
         [
-            "SteerEdit_demo_flac/Sample27/source.flac",
-            "SteerEdit_demo_flac/Sample27/prompt.txt",
-            "SteerEdit_demo_flac/Sample27/dds.flac",
-            "SteerEdit_demo_flac/Sample27/musicmagus.flac"
+            "SteerEdit_demo_flac/Sample17/source.flac",
+            "SteerEdit_demo_flac/Sample17/prompt.txt",
+            "SteerEdit_demo_flac/Sample17/dds.flac",
+            "SteerEdit_demo_flac/Sample17/musicmagus.flac"
         ],
         [
-            "SteerEdit_demo_flac/Sample27/source.flac",
-            "SteerEdit_demo_flac/Sample27/prompt.txt",
-            "SteerEdit_demo_flac/Sample27/ZETA.flac",
-            "SteerEdit_demo_flac/Sample27/dds.flac"
+            "SteerEdit_demo_flac/Sample23/source.flac",
+            "SteerEdit_demo_flac/Sample23/prompt.txt",
+            "SteerEdit_demo_flac/Sample23/dds.flac",
+            "SteerEdit_demo_flac/Sample23/musicmagus.flac"
+        ],
+        [
+            "SteerEdit_demo_flac/Sample18/source.flac",
+            "SteerEdit_demo_flac/Sample18/prompt.txt",
+            "SteerEdit_demo_flac/Sample18/ZETA.flac",
+            "SteerEdit_demo_flac/Sample18/dds.flac"
         ]
     ],
   "audio_questions2": [
     [
-        "SteerMusic_demo_flac/Sample2/Source.flac",
-        "SteerMusic_demo_flac/Sample2/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample2/bouzouki_1.flac",
-        "SteerMusic_demo_flac/Sample2/-5xOcMJpTUk_SteerMusic.flac",
-        "SteerMusic_demo_flac/Sample2/-5xOcMJpTUk_textinv.flac"
-    ],
-    [
-        "SteerMusic_demo_flac/Sample2/Source.flac",
-        "SteerMusic_demo_flac/Sample2/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample2/bouzouki_1.flac",
-        "SteerMusic_demo_flac/Sample2/-5xOcMJpTUk_DreamSound.flac",
-        "SteerMusic_demo_flac/Sample2/-5xOcMJpTUk_SteerMusic.flac"
-    ],
-    [
-        "SteerMusic_demo_flac/Sample7/source.flac",
-        "SteerMusic_demo_flac/Sample7/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample7/guitar_1.flac",
-        "SteerMusic_demo_flac/Sample7/0K-zyeLuKho_SteerMusic.flac",
-        "SteerMusic_demo_flac/Sample7/0K-zyeLuKho_textinv.flac"
+        "SteerMusic_demo_flac/Sample18/source.flac",
+        "SteerMusic_demo_flac/Sample18/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample18/reggae_1.flac",
+        "SteerMusic_demo_flac/Sample18/CrkxrgTiVyk_SteerMusic.flac",
+        "SteerMusic_demo_flac/Sample18/CrkxrgTiVyk_textinv.flac"
     ],
     [
         "SteerMusic_demo_flac/Sample7/source.flac",
@@ -164,27 +150,6 @@
         "SteerMusic_demo_flac/Sample7/0K-zyeLuKho_SteerMusic.flac"
     ],
     [
-        "SteerMusic_demo_flac/Sample8/source.flac",
-        "SteerMusic_demo_flac/Sample8/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample8/sitar_1.flac",
-        "SteerMusic_demo_flac/Sample8/0kQD1P0_KUs_SteerMusic.flac",
-        "SteerMusic_demo_flac/Sample8/0kQD1P0_KUs_textinv.flac"
-    ],
-    [
-        "SteerMusic_demo_flac/Sample8/source.flac",
-        "SteerMusic_demo_flac/Sample8/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample8/sitar_1.flac",
-        "SteerMusic_demo_flac/Sample8/0kQD1P0_KUs_DreamSound.flac",
-        "SteerMusic_demo_flac/Sample8/0kQD1P0_KUs_SteerMusic.flac"
-    ],
-    [
-        "SteerMusic_demo_flac/Sample9/source.flac",
-        "SteerMusic_demo_flac/Sample9/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample9/sitar_1.flac",
-        "SteerMusic_demo_flac/Sample9/07FxCXxknY4_SteerMusic.flac",
-        "SteerMusic_demo_flac/Sample9/07FxCXxknY4_textinv.flac"
-    ],
-    [
         "SteerMusic_demo_flac/Sample9/source.flac",
         "SteerMusic_demo_flac/Sample9/source_prompt.txt",
         "SteerMusic_demo_flac/Sample9/sitar_1.flac",
@@ -192,11 +157,11 @@
         "SteerMusic_demo_flac/Sample9/07FxCXxknY4_SteerMusic.flac"
     ],
     [
-        "SteerMusic_demo_flac/Sample16/source.flac",
-        "SteerMusic_demo_flac/Sample16/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample16/reggae_1.flac",
-        "SteerMusic_demo_flac/Sample16/C5MhO2HM2Wg_SteerMusic.flac",
-        "SteerMusic_demo_flac/Sample16/C5MhO2HM2Wg_textinv.flac"
+        "SteerMusic_demo_flac/Sample2/Source.flac",
+        "SteerMusic_demo_flac/Sample2/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample2/bouzouki_1.flac",
+        "SteerMusic_demo_flac/Sample2/-5xOcMJpTUk_DreamSound.flac",
+        "SteerMusic_demo_flac/Sample2/-5xOcMJpTUk_SteerMusic.flac"
     ],
     [
         "SteerMusic_demo_flac/Sample16/source.flac",
@@ -206,39 +171,25 @@
         "SteerMusic_demo_flac/Sample16/C5MhO2HM2Wg_SteerMusic.flac"
     ],
     [
-        "SteerMusic_demo_flac/Sample17/source.flac",
-        "SteerMusic_demo_flac/Sample17/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample17/reggae_1.flac",
-        "SteerMusic_demo_flac/Sample17/ClNTn1wtq7E_SteerMusic.flac",
-        "SteerMusic_demo_flac/Sample17/ClNTn1wtq7E_textinv.flac"
+        "SteerMusic_demo_flac/Sample35/source.flac",
+        "SteerMusic_demo_flac/Sample35/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample35/guitar_1.flac",
+        "SteerMusic_demo_flac/Sample35/07FxCXxknY4_SteerMusic.flac",
+        "SteerMusic_demo_flac/Sample35/07FxCXxknY4_textinv.flac"
     ],
     [
-        "SteerMusic_demo_flac/Sample17/source.flac",
-        "SteerMusic_demo_flac/Sample17/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample17/reggae_1.flac",
-        "SteerMusic_demo_flac/Sample17/ClNTn1wtq7E_DreamSound.flac",
-        "SteerMusic_demo_flac/Sample17/ClNTn1wtq7E_SteerMusic.flac"
+        "SteerMusic_demo_flac/Sample8/source.flac",
+        "SteerMusic_demo_flac/Sample8/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample8/sitar_1.flac",
+        "SteerMusic_demo_flac/Sample8/0kQD1P0_KUs_SteerMusic.flac",
+        "SteerMusic_demo_flac/Sample8/0kQD1P0_KUs_textinv.flac"
     ],
     [
-        "SteerMusic_demo_flac/Sample18/source.flac",
-        "SteerMusic_demo_flac/Sample18/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample18/reggae_1.flac",
-        "SteerMusic_demo_flac/Sample18/CrkxrgTiVyk_SteerMusic.flac",
-        "SteerMusic_demo_flac/Sample18/CrkxrgTiVyk_textinv.flac"
-    ],
-    [
-        "SteerMusic_demo_flac/Sample18/source.flac",
-        "SteerMusic_demo_flac/Sample18/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample18/reggae_1.flac",
-        "SteerMusic_demo_flac/Sample18/CrkxrgTiVyk_DreamSound.flac",
-        "SteerMusic_demo_flac/Sample18/CrkxrgTiVyk_SteerMusic.flac"
-    ],
-    [
-        "SteerMusic_demo_flac/Sample23/source.flac",
-        "SteerMusic_demo_flac/Sample23/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample23/hiphop_0.flac",
-        "SteerMusic_demo_flac/Sample23/CodqNx1ukOc_SteerMusic.flac",
-        "SteerMusic_demo_flac/Sample23/CodqNx1ukOc_textinv.flac"
+        "SteerMusic_demo_flac/Sample2/Source.flac",
+        "SteerMusic_demo_flac/Sample2/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample2/bouzouki_1.flac",
+        "SteerMusic_demo_flac/Sample2/-5xOcMJpTUk_SteerMusic.flac",
+        "SteerMusic_demo_flac/Sample2/-5xOcMJpTUk_textinv.flac"
     ],
     [
         "SteerMusic_demo_flac/Sample23/source.flac",
@@ -248,11 +199,53 @@
         "SteerMusic_demo_flac/Sample23/CodqNx1ukOc_SteerMusic.flac"
     ],
     [
-        "SteerMusic_demo_flac/Sample30/source.flac",
-        "SteerMusic_demo_flac/Sample30/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample30/sarabande_1.flac",
-        "SteerMusic_demo_flac/Sample30/Ee6MP1bIRUA_SteerMusic.flac",
-        "SteerMusic_demo_flac/Sample30/Ee6MP1bIRUA_textinv.flac"
+        "SteerMusic_demo_flac/Sample9/source.flac",
+        "SteerMusic_demo_flac/Sample9/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample9/sitar_1.flac",
+        "SteerMusic_demo_flac/Sample9/07FxCXxknY4_SteerMusic.flac",
+        "SteerMusic_demo_flac/Sample9/07FxCXxknY4_textinv.flac"
+    ],
+    [
+        "SteerMusic_demo_flac/Sample7/source.flac",
+        "SteerMusic_demo_flac/Sample7/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample7/guitar_1.flac",
+        "SteerMusic_demo_flac/Sample7/0K-zyeLuKho_SteerMusic.flac",
+        "SteerMusic_demo_flac/Sample7/0K-zyeLuKho_textinv.flac"
+    ],
+    [
+        "SteerMusic_demo_flac/Sample8/source.flac",
+        "SteerMusic_demo_flac/Sample8/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample8/sitar_1.flac",
+        "SteerMusic_demo_flac/Sample8/0kQD1P0_KUs_DreamSound.flac",
+        "SteerMusic_demo_flac/Sample8/0kQD1P0_KUs_SteerMusic.flac"
+    ],
+    [
+        "SteerMusic_demo_flac/Sample35/source.flac",
+        "SteerMusic_demo_flac/Sample35/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample35/guitar_1.flac",
+        "SteerMusic_demo_flac/Sample35/07FxCXxknY4_DreamSound.flac",
+        "SteerMusic_demo_flac/Sample35/07FxCXxknY4_SteerMusic.flac"
+    ],
+    [
+        "SteerMusic_demo_flac/Sample16/source.flac",
+        "SteerMusic_demo_flac/Sample16/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample16/reggae_1.flac",
+        "SteerMusic_demo_flac/Sample16/C5MhO2HM2Wg_SteerMusic.flac",
+        "SteerMusic_demo_flac/Sample16/C5MhO2HM2Wg_textinv.flac"
+    ],
+    [
+        "SteerMusic_demo_flac/Sample23/source.flac",
+        "SteerMusic_demo_flac/Sample23/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample23/hiphop_0.flac",
+        "SteerMusic_demo_flac/Sample23/CodqNx1ukOc_SteerMusic.flac",
+        "SteerMusic_demo_flac/Sample23/CodqNx1ukOc_textinv.flac"
+    ],
+    [
+        "SteerMusic_demo_flac/Sample17/source.flac",
+        "SteerMusic_demo_flac/Sample17/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample17/reggae_1.flac",
+        "SteerMusic_demo_flac/Sample17/ClNTn1wtq7E_DreamSound.flac",
+        "SteerMusic_demo_flac/Sample17/ClNTn1wtq7E_SteerMusic.flac"
     ],
     [
         "SteerMusic_demo_flac/Sample30/source.flac",
@@ -262,18 +255,25 @@
         "SteerMusic_demo_flac/Sample30/Ee6MP1bIRUA_SteerMusic.flac"
     ],
     [
-        "SteerMusic_demo_flac/Sample35/source.flac",
-        "SteerMusic_demo_flac/Sample35/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample35/guitar_1.flac",
-        "SteerMusic_demo_flac/Sample35/07FxCXxknY4_SteerMusic.flac",
-        "SteerMusic_demo_flac/Sample35/07FxCXxknY4_textinv.flac"
+        "SteerMusic_demo_flac/Sample17/source.flac",
+        "SteerMusic_demo_flac/Sample17/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample17/reggae_1.flac",
+        "SteerMusic_demo_flac/Sample17/ClNTn1wtq7E_SteerMusic.flac",
+        "SteerMusic_demo_flac/Sample17/ClNTn1wtq7E_textinv.flac"
     ],
     [
-        "SteerMusic_demo_flac/Sample35/source.flac",
-        "SteerMusic_demo_flac/Sample35/source_prompt.txt",
-        "SteerMusic_demo_flac/Sample35/guitar_1.flac",
-        "SteerMusic_demo_flac/Sample35/07FxCXxknY4_DreamSound.flac",
-        "SteerMusic_demo_flac/Sample35/07FxCXxknY4_SteerMusic.flac"
+        "SteerMusic_demo_flac/Sample30/source.flac",
+        "SteerMusic_demo_flac/Sample30/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample30/sarabande_1.flac",
+        "SteerMusic_demo_flac/Sample30/Ee6MP1bIRUA_SteerMusic.flac",
+        "SteerMusic_demo_flac/Sample30/Ee6MP1bIRUA_textinv.flac"
+    ],
+    [
+        "SteerMusic_demo_flac/Sample18/source.flac",
+        "SteerMusic_demo_flac/Sample18/source_prompt.txt",
+        "SteerMusic_demo_flac/Sample18/reggae_1.flac",
+        "SteerMusic_demo_flac/Sample18/CrkxrgTiVyk_DreamSound.flac",
+        "SteerMusic_demo_flac/Sample18/CrkxrgTiVyk_SteerMusic.flac"
     ]
   ]
 }

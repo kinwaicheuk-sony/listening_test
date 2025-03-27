@@ -209,12 +209,13 @@ elif st.session_state.page == "Listening test 1":
 
     # Progress Bar
     st.write("### Progress")
-    cols = st.columns(5)
+    num_cols = 5
+    cols = st.columns(num_cols)
     for idx, _ in enumerate(audio_questions):
         completed = idx in st.session_state.ratings['p1_q1']
         is_current = idx == st.session_state.test_index
         status = "✅" if completed and not is_current else "▶️" if is_current else "⬜"
-        with cols[idx % 5]:
+        with cols[idx % num_cols]:
             if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):
                 st.session_state.test_index = idx
                 st.rerun()
@@ -231,8 +232,11 @@ elif st.session_state.page == "Listening test 1":
             if st.session_state.test_index not in st.session_state.ratings['p1_q1']:
                 for idx, (a, b) in enumerate(zip(answer_list_1, answer_list_2)):
                     new_entry = pd.DataFrame([{
-                        "question_type": 'test1', "Sample_ID": sample_id,
-                        "Model_name": model_id[idx], "question1": a, "question2": b,
+                        "question_type": 'test1',
+                        "Sample_ID": sample_id,
+                        "Model_name": model_id[idx],
+                        "question1": a,
+                        "question2": b,
                     }])
                     user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
                 
@@ -270,26 +274,22 @@ elif st.session_state.page == "Listening test 1":
             st.rerun()
 
 elif st.session_state.page == "Listening test 2":
+    # set question type for csv logging
+    st.session_state.question_type = 'test2'
+
+    model_id = {0: "SteerMusic", 1: "textinv", 2: "DreamSound" }
+
     # Show progress bar with clickable selection
     st.write("### Progress")
     num_cols = 5
-    cols = st.columns(num_cols)  # Adjust column count
-    st.session_state.question_type = 'test2'
-
-    for idx in range(len(audio_questions2)):
-        completed = idx in st.session_state.ratings2  # Check if the question has been rated
-        is_current = idx == st.session_state.test_index2  # Check if it's the current question
-
-        if completed and not is_current:
-            status = "✅"  # Completed question
-        elif is_current:
-            status = "▶️"  # Currently selected question
-        else:
-            status = "⬜"  # Not answered yet
-        
-        with cols[idx % num_cols]:  # Arrange in rows
+    cols = st.columns(num_cols)
+    for idx, _ in enumerate(audio_questions2):
+        completed = idx in st.session_state.ratings['p2_q1']
+        is_current = idx == st.session_state.test_index
+        status = "✅" if completed and not is_current else "▶️" if is_current else "⬜"
+        with cols[idx % num_cols]:
             if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):
-                st.session_state.test_index2 = idx
+                st.session_state.test_index = idx
                 st.rerun()
 
     # Get current question audio files
@@ -331,152 +331,132 @@ elif st.session_state.page == "Listening test 2":
 
     answer_list_1 = []
     answer_list_2 = []
-    st.write("#### Edited result 1")
-    st.audio(audio_files[3], format="audio/flac")
+
+    # Display edited results and rating buttons
+    for i, audio_file in enumerate(audio_files[3:], start=1):
+        st.write(f"#### Edited result {i}")
+        st.audio(audio_file, format="audio/flac")
+
+        answer_list_1.append(render_rating_buttons(
+            5, f"Question {2 * i - 1}:",
+            "Please rate how well the content (e.g., melody and vocal elements) remains consistent with the source music.",
+            i - 1, st.session_state.test_index,
+            st.session_state.ratings['p2_q1'], "test2q1"
+        ))
+
+        answer_list_2.append(render_rating_buttons(
+            5, f"Question {2 * i}:",
+            f"Please rate how well the edited result matches the style of **{concept_label}**.",
+            i - 1, st.session_state.test_index,
+            st.session_state.ratings['p2_q2'], "test2q2"
+        ))    
     
-    result1 = render_rating_buttons(
-        5,
-        f"Question 1:",
-        "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?")
-    answer_list_1.append(result1)
-    result2 = render_rating_buttons(
-        5,
-        f"Question 2:",
-        f"Please rate how well the edited result matches the style of **{concept_label}** on the reference music?")
-    answer_list_1.append(result2)    
+    # result1 = render_rating_buttons(
+    #     5,
+    #     f"Question 1:",
+    #     "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?")
+    # answer_list_1.append(result1)
+    # result2 = render_rating_buttons(
+    #     5,
+    #     f"Question 2:",
+    #     f"Please rate how well the edited result matches the style of **{concept_label}** on the reference music?")
+    # answer_list_1.append(result2)    
     
 
-    st.write("#### Edited result 2")
-    st.audio(audio_files[4], format="audio/flac")
+    # st.write("#### Edited result 2")
+    # st.audio(audio_files[4], format="audio/flac")
     
-    result1 = render_rating_buttons(
-        5,
-        f"Question 1:",
-        "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?")
-    answer_list_1.append(result1)
-    result2 = render_rating_buttons(
-        5,
-        f"Question 2:",
-        f"Please rate how well the edited result matches the style of **{concept_label}** on the reference music?")
-    answer_list_1.append(result2)    
+    # result1 = render_rating_buttons(
+    #     5,
+    #     f"Question 1:",
+    #     "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?")
+    # answer_list_1.append(result1)
+    # result2 = render_rating_buttons(
+    #     5,
+    #     f"Question 2:",
+    #     f"Please rate how well the edited result matches the style of **{concept_label}** on the reference music?")
+    # answer_list_1.append(result2)    
 
-    st.write("#### Edited result 3")
-    st.audio(audio_files[5], format="audio/flac")
+    # st.write("#### Edited result 3")
+    # st.audio(audio_files[5], format="audio/flac")
     
-    result1 = render_rating_buttons(
-        5,
-        f"Question 1:",
-        "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?")
-    answer_list_1.append(result1)
-    result2 = render_rating_buttons(
-        5,
-        f"Question 2:",
-        f"Please rate how well the edited result matches the style of **{concept_label}** on the reference music?")
-    answer_list_1.append(result2)    
+    # result1 = render_rating_buttons(
+    #     5,
+    #     f"Question 1:",
+    #     "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?")
+    # answer_list_1.append(result1)
+    # result2 = render_rating_buttons(
+    #     5,
+    #     f"Question 2:",
+    #     f"Please rate how well the edited result matches the style of **{concept_label}** on the reference music?")
+    # answer_list_1.append(result2)    
 
-    # Dislay this message when the test is completed
-    if (st.session_state.test_completed!=True) and st.session_state.test_completed2:
-        st.success(
-            """
-            #### Thank you for completing part 2 of the test!  
-            ##### You can review/edit your ratings in this part.
-            """
-        )
-    elif (st.session_state.test_completed==True) and st.session_state.test_completed2:
-        st.success(
-            """
-            #### Thank you for completing everything!  
-            ##### You can close the browser now.  
-            ##### Or you can review/edit your ratings by clicking the progress bar
-            """
-        )
-        # st.success("#### You can close the browser now.")
-        # st.success("#### Or you can review/edit your ratings by clicking the progress bar"
+    # # Dislay this message when the test is completed
+    # if (st.session_state.test_completed!=True) and st.session_state.test_completed2:
+    #     st.success(
+    #         """
+    #         #### Thank you for completing part 2 of the test!  
+    #         ##### You can review/edit your ratings in this part.
+    #         """
+    #     )
+    # elif (st.session_state.test_completed==True) and st.session_state.test_completed2:
+    #     st.success(
+    #         """
+    #         #### Thank you for completing everything!  
+    #         ##### You can close the browser now.  
+    #         ##### Or you can review/edit your ratings by clicking the progress bar
+    #         """
+    #     )
 
-    # Collect ratings
-    # default_ratings = st.session_state.ratings2.get(st.session_state.test_index2, [3, 3, 3])
-
-
-    # create buttons
-    # render_rating_buttons(
-    #     2,
-    #     f"Question {st.session_state.test_index2+1}:",
-    #     "Which editing sounds closer to the concept in the reference audio while maintaining the content in the source audio?")
-
-
-
-    model_id = {0: "SteerMusic", 1: "textinv", 2: "DreamSound" }
+    print()
     if st.button("Submit Ratings"):
-        if st.session_state.selected_ratings == None:
+        sample_id = audio_questions[st.session_state.test_index][0].split("/")[1]
+        
+        if len([x for x in answer_list_1 if x is not None]) < 3 or len([x for x in answer_list_2 if x is not None]) < 3:
             st.error("Please select your rating before proceeding.")
-        else:        
-            if tuple(audio_files) not in st.session_state.ratings2:
-                st.session_state.ratings2[st.session_state.test_index2] = st.session_state.selected_ratings
-
-                # Load existing data
-                user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
-
-                if not st.session_state.test_completed2:
-                # Load existing data
-                # user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
-
-                # if not st.session_state.test_completed:
-                    for idx, (a, b) in enumerate(zip(answer_list_1, answer_list_2)):
-                        # Append a new row if question does not exist
-                        new_entry = pd.DataFrame([{
-                            "question_type": 'test1',
-                            "Sample_ID":  audio_questions[0][0].split("/")[1],
-                            "Model_name": model_id[idx],
-                            "question1": a,
-                            "question2": b,
-                        }])
-                        user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
-
-                    # Save back to CSV (overwrite the file)
-                    user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)    
-
-                    # # Append a new row if question does not exist
-                    # new_entry = pd.DataFrame([{
-                    #     "question_type": 'test2',
-                    #     "question": st.session_state.test_index2,
-                    #     "selection": st.session_state.selected_ratings,
-                    # }])
-                    # user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
-
-                    # Save back to CSV (overwrite the file)
-                    user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)    
-
-            # Modifying existing data when the test is completed
-            if len(st.session_state.ratings2) >= len(audio_questions2):
-                st.session_state.test_completed2 = True
-
-                finish_time = datetime.datetime.now()
-
-                # Load existing data
-                user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
-
-                # Update only the row where both conditions are met
-                user_ratings_df.loc[
-                    (user_ratings_df["question"] == st.session_state.test_index2) & 
-                    (user_ratings_df["question_type"] == "test2"), 
-                    "selection"
-                ] = st.session_state.selected_ratings
-
-                # Check if finish_time column exists, if not, add it
-                if "finish_time" in user_ratings_df.columns:
-                    user_ratings_df.at[0, "finish_time"] = finish_time  # Update the first row
-                else:
-                    user_ratings_df["finish_time"] = None  # Create column if missing
-                    user_ratings_df.at[0, "finish_time"] = finish_time  # Assign value
-
-                # Save back to CSV (overwrite the file)
-                user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
-
+        else:
+            user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
+            
+            if st.session_state.test_index not in st.session_state.ratings['p2_q1']:
+                for idx, (a, b) in enumerate(zip(answer_list_1, answer_list_2)):
+                    new_entry = pd.DataFrame([{
+                        "question_type": 'test1',
+                        "Sample_ID": sample_id,
+                        "Model_name": model_id[idx],
+                        "question1": a,
+                        "question2": b,
+                    }])
+                    user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
+                
+                st.session_state.ratings['p2_q1'][st.session_state.test_index] = answer_list_1
+                st.session_state.ratings['p2_q2'][st.session_state.test_index] = answer_list_2
             else:
-                # Move to the next unanswered question
-                for i in range(len(audio_questions2)):
-                    if i not in st.session_state.ratings2:  # Find first unanswered question
-                        st.session_state.test_index2 = i
-                        break  # Stop searching once we find an unanswered question
-            st.session_state.selected_ratings = None
+                for idx, (a, b) in enumerate(zip(answer_list_1, answer_list_2)):
+                    user_ratings_df.loc[
+                        (user_ratings_df["Sample_ID"] == sample_id) &
+                        (user_ratings_df["question_type"] == "test2") &
+                        (user_ratings_df["Model_name"] == model_id[idx]), "question1"] = a
+                    user_ratings_df.loc[
+                        (user_ratings_df["Sample_ID"] == sample_id) &
+                        (user_ratings_df["question_type"] == "test2") &
+                        (user_ratings_df["Model_name"] == model_id[idx]), "question2"] = b
+                
+                st.session_state.ratings['p2_q1'][st.session_state.test_index] = answer_list_1
+                st.session_state.ratings['p2_q2'][st.session_state.test_index] = answer_list_2
+            
+            if len(st.session_state.ratings['p2_q1']) >= len(audio_questions):
+                st.session_state.page = "Tutorial 2"
+                st.session_state.test_completed = True
+                finish_time = datetime.datetime.now()
+                if "finish_time" not in user_ratings_df.columns:
+                    user_ratings_df["finish_time"] = None
+                user_ratings_df.at[0, "finish_time"] = finish_time
+            
+            user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
+            
+            for i in range(len(audio_questions)):
+                if i not in st.session_state.ratings['p2_q1']:
+                    st.session_state.test_index = i
+                    st.rerun()
+                    break
             st.rerun()

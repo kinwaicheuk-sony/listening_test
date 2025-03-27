@@ -91,7 +91,6 @@ if "user_info_collected" not in st.session_state:
 # ========== End of Parameters Initalization ============
 
 # Title
-st.markdown('<a name="top"></a>', unsafe_allow_html=True)
 st.title("Audio Rating App")
 
 # Sidebar Navigation
@@ -315,28 +314,8 @@ elif st.session_state.page.startswith("Tutorial"):
             st.rerun()
 
 elif st.session_state.page == "Listening test 1":
-    # Show progress bar with clickable selection
-    st.write("### Progress")
-    num_cols = 5
-    cols = st.columns(num_cols)  # Adjust column count
     st.session_state.question_type = 'test1'
     print(f"***{st.session_state.ratings['p1_q1'].keys()=}")
-    for idx in range(len(audio_questions)):
-        print(f"****** {(idx in st.session_state.ratings['p1_q1'].keys())=}")
-        completed = idx in st.session_state.ratings['p1_q1'].keys()  # Check if the question has been rated
-        is_current = idx == st.session_state.test_index  # Check if it's the current question
-
-        if completed and not is_current:
-            status = "✅"  # Completed question
-        elif is_current:
-            status = "▶️"  # Currently selected question
-        else:
-            status = "⬜"  # Not answered yet
-        
-        with cols[idx % num_cols]:  # Arrange in rows
-            if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):
-                st.session_state.test_index = idx
-                st.rerun()
 
     # Get current question audio files
     audio_files = audio_questions[st.session_state.test_index]
@@ -436,10 +415,27 @@ elif st.session_state.page == "Listening test 1":
     #     "Which edited result better preserves the original melody and vocal content from the source while successfully changing the musical style or instrument indicated in the brackets?")
 
     model_id = {0: "SteerEdit", 1: "MusicMagus", 2: "ZETA", 3: "DDIM",4: "SDEdit" }
+    # Show progress bar with clickable selection
+    st.write("### Progress")
+    num_cols = 5
+    cols = st.columns(num_cols)  # Adjust column count    
+    for idx in range(len(audio_questions)):
+        print(f"****** {(idx in st.session_state.ratings['p1_q1'].keys())=}")
+        completed = idx in st.session_state.ratings['p1_q1'].keys()  # Check if the question has been rated
+        is_current = idx == st.session_state.test_index  # Check if it's the current question
 
+        if completed and not is_current:
+            status = "✅"  # Completed question
+        elif is_current:
+            status = "▶️"  # Currently selected question
+        else:
+            status = "⬜"  # Not answered yet
+        
+        with cols[idx % num_cols]:  # Arrange in rows
+            if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):
+                st.session_state.test_index = idx
+                st.rerun()
     if st.button("Submit Ratings"):
-        # Redirect user back to the top anchor
-        st.markdown('<meta http-equiv="refresh" content="0; URL=#top">', unsafe_allow_html=True)       
         sample_id = audio_questions[st.session_state.test_index][0].split("/")[1]
         print(f"button clicked: {st.session_state.ratings['p1_q1'].get(st.session_state.test_index, None)=}")
         if len(answer_list_1) < 5 or len(answer_list_2) < 5:

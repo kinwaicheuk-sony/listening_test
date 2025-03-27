@@ -438,7 +438,9 @@ elif st.session_state.page == "Listening test 1":
     if st.button("Submit Ratings"):
         sample_id = audio_questions[st.session_state.test_index][0].split("/")[1]
         print(f"button clicked: {st.session_state.ratings['p1_q1'].get(st.session_state.test_index, None)=}")
-        if len(answer_list_1) < 5 or len(answer_list_2) < 5:
+        non_none_count1 = len([x for x in answer_list_1 if x is not None])
+        non_none_count2 = len([x for x in answer_list_2 if x is not None])
+        if non_none_count1 < 5 or non_none_count2 < 5:
             st.error("Please select your rating before proceeding.")
         else:
             # check if the question has been answered

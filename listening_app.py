@@ -31,14 +31,19 @@ def update_page():
     st.session_state.page = st.session_state.page_selection
 
 # Rating buttons
-def render_rating_buttons(num_buttons, label, instruction, index, log, key_prefix):
+def render_rating_buttons(num_buttons, label, instruction, model_index, q_index, log, key_prefix):
     """Generalized function to render rating buttons."""
     st.write(f"##### {label}")
     mos_score = {0: "Bad", 1: "Poor", 2: "Fair", 3: "Good", 4: "Excellent"}
 
-    # Retrieve previous selection if it exists
-    previous_selections = log.get(st.session_state.test_index, None)
-    previous_selection = previous_selections[index] if previous_selections is not None else None
+    if 'tutorial' in key_prefix:
+        # Retrieve previous selection if it exists
+        previous_selections = log.get(q_index, None)
+        previous_selection = previous_selections[model_index] if previous_selections is not None else None
+    elif 'test' in key_prefix:
+        # Retrieve previous selection if it exists
+        previous_selections = log.get(q_index, None)
+        previous_selection = previous_selections[model_index] if previous_selections is not None else None
 
     # Render radio buttons
     selected_option = st.radio(
@@ -46,7 +51,7 @@ def render_rating_buttons(num_buttons, label, instruction, index, log, key_prefi
         options=list(range(num_buttons)),
         format_func=lambda x: f"{x + 1}: {mos_score[x]}",
         index=previous_selection if previous_selection is not None else None,
-        key=f"{key_prefix}_{label}_{st.session_state.test_index}"
+        key=f"{key_prefix}_{model_index}_{q_index}"
     )
 
     return selected_option
@@ -57,14 +62,18 @@ def render_rating_buttons(num_buttons, label, instruction, index, log, key_prefi
 # store ratings in session state
 # activate only once
 if "ratings" not in st.session_state:
-    st.session_state.ratings = {}  # Store ratings per question    
+    st.session_state.ratings = {}  # Store ratings per question
+    # for tutorial
+    st.session_state.ratings["t1_q1"] = {}
+    st.session_state.ratings["t1_q2"] = {}
+    st.session_state.ratings["t2_q1"] = {}
+    st.session_state.ratings["t2_q2"] = {}     
     # for part 1 
     st.session_state.ratings["p1_q1"] = {}
     st.session_state.ratings["p1_q2"] = {}
     # for part 2    
     st.session_state.ratings["p2_q1"] = {}
     st.session_state.ratings["p2_q2"] = {}
-    st.session_state.ratings_tutorial = {}
 
 # store question types: flow of the study tutorial -> test
 if "question_type" not in st.session_state:
@@ -149,8 +158,8 @@ if st.session_state.page == "User Info":
                 st.session_state.user_ratings_file = user_ratings_file  # Store in session
                 
                 st.session_state.user_info_collected = True
-                # st.session_state.page = "Tutorial 1"  # Move to the first tutorial
-                st.session_state.page = "Listening test 1"  # Move to the first tutorial
+                st.session_state.page = "Tutorial 1"  # Move to the first tutorial
+                # st.session_state.page = "Listening test 1"  # Move to the first tutorial
                 st.success("Information saved! Proceed to the test.")
             elif st.session_state.test_completed:
                 # Modifying existing data when the test is completed
@@ -208,10 +217,6 @@ elif st.session_state.page.startswith("Tutorial"):
         st.audio(file_paths[0], start_time=0, format="audio/flac")
         st.write("##### Edit instruction")
         st.write("Edit the source **piano** music to a **flute** music.")
-        # st.write("##### target prompt")        
-        # st.write("A famous classicial music played on a [**flute**]")   
-        # col1, col2 = st.columns(2)
-        # with col1:
         st.write("#### edited result")
         st.audio(file_paths[1], format="audio/flac")
         
@@ -221,9 +226,27 @@ elif st.session_state.page.startswith("Tutorial"):
         st.write("#### Question 2:")
         st.write("Please rate how well the edited result matches the style of **flute**?")
     
-        # with col2:
-        #     st.write("#### edited result 2")
-        #     st.audio(file_paths[2], format="audio/flac")             
+        result1 = render_rating_buttons(
+            5,
+            f"Example 1:",
+            "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?",
+            0,
+            st.session_state.tutorial_index,
+            st.session_state.ratings['p1_q1'],
+            "tutorial1q1"
+        )
+        result2 = render_rating_buttons(
+            5,
+            f"Example 2:",
+            f"Please rate how well the edited result matches the style of **xxx**?",
+            0,
+            st.session_state.tutorial_index,
+            st.session_state.ratings['p1_q2'],
+            "tutorial1q2"
+        )
+        st.session_state.ratings["t1_q1"] = result1
+        st.session_state.ratings["t1_q2"] = result2        
+          
     elif st.session_state.tutorial_index == 1:
         col1, col2 = st.columns(2)
         with col1:
@@ -252,16 +275,21 @@ elif st.session_state.page.startswith("Tutorial"):
 
 
     # create buttons
-    render_rating_buttons1(
-        5,
-        "Your Anwser",
-        instructions[st.session_state.tutorial_index],
-        1
-        )
+    # render_rating_buttons(
+    #     5,
+    #     "Your Anwser",
+    #     instructions[st.session_state.tutorial_index],
+    #     1
+    #     )
+    
 
     if st.button("Next"): # determines how many tutorials there are
         finish_time = datetime.datetime.now()
-        if st.session_state.selected_ratings == None and st.session_state.test_completed != True:
+        print(f"{result1=}")
+        print(f"{result2=}")
+        print(f"{((result1==None or result2==None))=}")
+        print(f"{st.session_state.test_completed=}")
+        if (result1==None or result2==None) and  st.session_state.test_completed != True:
             st.error("Please select your rating before proceeding.")
         elif st.session_state.selected_ratings == None and st.session_state.test_completed == True:
             st.error("Rating not changed.")
@@ -369,8 +397,9 @@ elif st.session_state.page == "Listening test 1":
             f"Question {2 * i - 1}:",
             "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?",
             i - 1,
+            st.session_state.test_index,
             st.session_state.ratings['p1_q1'],
-            "radio1"
+            "test1q1"
         )
         answer_list_1.append(result1)
 
@@ -379,8 +408,9 @@ elif st.session_state.page == "Listening test 1":
             f"Question {2 * i}:",
             f"Please rate how well the edited result matches the style of **{target_prompt}**?",
             i - 1,
+            st.session_state.test_index,
             st.session_state.ratings['p1_q2'],
-            "radio2"
+            "test1q2"
         )
         answer_list_2.append(result2)
 
@@ -491,23 +521,28 @@ elif st.session_state.page == "Listening test 1":
 
                 # update the log_dict
                 st.session_state.ratings['p1_q1'][st.session_state.test_index] = answer_list_1
-                st.session_state.ratings['p1_q2'][st.session_state.test_index] = answer_list_2                
+                st.session_state.ratings['p1_q2'][st.session_state.test_index] = answer_list_2
+            else:
+                raise ValueError('Case not considered')           
 
-                # Check if all questions have been answered in this part
-                if len(st.session_state.ratings['p1_q1']) >= len(audio_questions):
-                    # st.session_state.page = "Listening test 2"  # Move to the test      
-                    st.session_state.page = "Tutorial 2"  # Move to tutorial 2 instead of test2     
-                    finish_time = datetime.datetime.now()                    
-                    st.session_state.test_completed = True
-                    # Check if finish_time column exists, if not, add it
-                    if "finish_time" in user_ratings_df.columns:
-                        user_ratings_df.at[0, "finish_time"] = finish_time  # Update the first row
-                    else:
-                        user_ratings_df["finish_time"] = None  # Create column if missing
-                        user_ratings_df.at[0, "finish_time"] = finish_time  # Assign value
+            # Check if all questions have been answered in this part
+            print(f"******{len(st.session_state.ratings['p1_q1'])=}")
+            print(f"{(len(st.session_state.ratings['p1_q1']) >= len(audio_questions))=}")
+            if len(st.session_state.ratings['p1_q1']) >= len(audio_questions):
+                print(f"MMMMMMEEEEE")
+                # st.session_state.page = "Listening test 2"  # Move to the test      
+                st.session_state.page = "Tutorial 2"  # Move to tutorial 2 instead of test2     
+                finish_time = datetime.datetime.now()                    
+                st.session_state.test_completed = True
+                # Check if finish_time column exists, if not, add it
+                if "finish_time" in user_ratings_df.columns:
+                    user_ratings_df.at[0, "finish_time"] = finish_time  # Update the first row
+                else:
+                    user_ratings_df["finish_time"] = None  # Create column if missing
+                    user_ratings_df.at[0, "finish_time"] = finish_time  # Assign value
 
-                # Save back to CSV (overwrite the file)
-                user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)                             
+            # Save back to CSV (overwrite the file)
+            user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)                             
 
             
             # Move to the next unanswered question
@@ -516,8 +551,9 @@ elif st.session_state.page == "Listening test 1":
                 print(f"======={i in st.session_state.ratings['p1_q1'].keys()=}")
                 if i not in st.session_state.ratings['p1_q1'].keys():  # Find first unanswered question
                     st.session_state.test_index = i
+                    st.rerun()
                     break  # Stop searching once we find an unanswered question                          
-            st.session_state.selected_ratings = None
+            # st.session_state.selected_ratings = None
             st.rerun()      
 
 

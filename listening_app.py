@@ -31,78 +31,26 @@ def update_page():
     st.session_state.page = st.session_state.page_selection
 
 # Rating buttons
-def render_rating_buttons1(num_buttons, label, instruction, index, log):
+def render_rating_buttons(num_buttons, label, instruction, index, log, key_prefix):
+    """Generalized function to render rating buttons."""
     st.write(f"##### {label}")
-    mos_score = {0:"Bad", 1: "Poor", 2: "Fair", 3:"Good", 4:"Excellent" }
-    # Determine the index to store ratings
-    # if st.session_state.question_type == "tutorial":
-    #     index = st.session_state.tutorial_index
-    #     log_dict = st.session_state.ratings_tutorial
-    # elif st.session_state.question_type == "test1":
-    #     index = st.session_state.test_index
-    #     log_dict = st.session_state.ratings
-    # elif st.session_state.question_type == "test2":
-    #     index = st.session_state.test_index2
-    #     log_dict = st.session_state.ratings2
+    mos_score = {0: "Bad", 1: "Poor", 2: "Fair", 3: "Good", 4: "Excellent"}
 
     # Retrieve previous selection if it exists
     previous_selections = log.get(st.session_state.test_index, None)
-    if previous_selections is not None:
-        previous_selection = previous_selections[index]
-    else:
-        previous_selection = None
+    previous_selection = previous_selections[index] if previous_selections is not None else None
 
-    # Use a temporary variable to hold the selection
+    # Render radio buttons
     selected_option = st.radio(
         f" {instruction}",
         options=list(range(num_buttons)),
         format_func=lambda x: f"{x + 1}: {mos_score[x]}",
         index=previous_selection if previous_selection is not None else None,
-        key=f"radio1_{label}_{st.session_state.test_index}"
+        key=f"{key_prefix}_{label}_{st.session_state.test_index}"
     )
-    # # Only update session state if the selection has changed
-    # if log_dict1.get(index) != selected_option:
-    #     log_dict1[index] = selected_option
-    #     st.session_state.selected_ratings = selected_option
-    #     st.rerun()  # Force re-rendering immediately, otherwise double click is required
+
     return selected_option
 
-# Rating buttons
-def render_rating_buttons2(num_buttons, label, instruction, index, log):
-    st.write(f"##### {label}")
-    mos_score = {0:"Bad", 1: "Poor", 2: "Fair", 3:"Good", 4:"Excellent" }
-    # Determine the index to store ratings
-    # if st.session_state.question_type == "tutorial":
-    #     index = st.session_state.tutorial_index
-    #     log_dict = st.session_state.ratings_tutorial
-    # elif st.session_state.question_type == "test1":
-    #     index = st.session_state.test_index
-    #     log_dict = st.session_state.ratings
-    # elif st.session_state.question_type == "test2":
-    #     index = st.session_state.test_index2
-    #     log_dict = st.session_state.ratings2
-
-    # Retrieve previous selection if it exists
-    previous_selections = log.get(st.session_state.test_index, None)
-    if previous_selections is not None:
-        previous_selection = previous_selections[index]
-    else:
-        previous_selection = None
-
-    # Use a temporary variable to hold the selection
-    selected_option = st.radio(
-        f" {instruction}",
-        options=list(range(num_buttons)),
-        format_func=lambda x: f"{x + 1}: {mos_score[x]}",
-        index=previous_selection if previous_selection is not None else None,
-        key=f"radio2_{label}_{st.session_state.test_index}"
-    )
-    # # Only update session state if the selection has changed
-    # if log_dict2.get(index) != selected_option:
-    #     log_dict2[index] = selected_option
-    #     st.session_state.selected_ratings = selected_option
-    #     st.rerun()  # Force re-rendering immediately, otherwise double click is required
-    return selected_option
 
 
 # ========== Parameters Initalization ============
@@ -143,6 +91,7 @@ if "user_info_collected" not in st.session_state:
 # ========== End of Parameters Initalization ============
 
 # Title
+st.markdown('<a name="top"></a>', unsafe_allow_html=True)
 st.title("Audio Rating App")
 
 # Sidebar Navigation
@@ -429,94 +378,32 @@ elif st.session_state.page == "Listening test 1":
     st.write("#### Edited result 1")
     st.audio(audio_files[2], format="audio/flac")
     
-    result1 = render_rating_buttons1(
-        5,
-        f"Question 1:",
-        "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?",
-        0,
-        st.session_state.ratings['p1_q1'])
-    answer_list_1.append(result1)
-    result2 = render_rating_buttons2(
-        5,
-        f"Question 2:",
-        f"Please rate how well the edited result matches the style of **{target_prompt}**?",
-        0,
-        st.session_state.ratings['p1_q2'])
-    answer_list_2.append(result2)
+    # Loop-based approach to eliminate redundant calls
+    answer_list_1, answer_list_2 = [], []
 
-    st.write("#### Edited result 2")
-    st.audio(audio_files[3], format="audio/flac")
-    
-    result1 = render_rating_buttons1(
-        5,
-        f"Question 3:",
-        "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?",
-        1,
-        st.session_state.ratings['p1_q1'])
-    answer_list_1.append(result1)
-    result2 = render_rating_buttons2(
-        5,
-        f"Question 4:",
-        f"Please rate how well the edited result matches the style of **{target_prompt}**?",
-        1,
-        st.session_state.ratings['p1_q2'])
-    answer_list_2.append(result2)
+    for i, audio_file in enumerate(audio_files[2:], start=1):  # Skipping first two files if needed
+        st.write(f"#### Edited result {i}")
+        st.audio(audio_file, format="audio/flac")
 
-    st.write("#### Edited result 3")
-    st.audio(audio_files[4], format="audio/flac")
-    
-    result1 = render_rating_buttons1(
-        5,
-        f"Question 5:",
-        "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?",
-        2,
-        st.session_state.ratings['p1_q1'])
-    answer_list_1.append(result1)
-    result2 = render_rating_buttons2(
-        5,
-        f"Question 6:",
-        f"Please rate how well the edited result matches the style of **{target_prompt}**?",
-        2,
-        st.session_state.ratings['p1_q2'])
-    answer_list_2.append(result2)
+        result1 = render_rating_buttons(
+            5,
+            f"Question {2 * i - 1}:",
+            "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?",
+            i - 1,
+            st.session_state.ratings['p1_q1'],
+            "radio1"
+        )
+        answer_list_1.append(result1)
 
-    st.write("#### Edited result 4")
-    st.audio(audio_files[5], format="audio/flac")
-    
-    result1 = render_rating_buttons1(
-        5,
-        f"Question 7:",
-        "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?",
-        3,
-        st.session_state.ratings['p1_q1'])
-    answer_list_1.append(result1)
-    result2 = render_rating_buttons2(
-        5,
-        f"Question 8:",
-        f"Please rate how well the edited result matches the style of **{target_prompt}**?",
-        3,
-        st.session_state.ratings['p1_q2'])
-    answer_list_2.append(result2)
-
-    st.write("#### Edited result 5")
-    st.audio(audio_files[6], format="audio/flac")
-    
-    result1 = render_rating_buttons1(
-        5,
-        f"Question 9:",
-        "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?",
-        4,
-        st.session_state.ratings['p1_q1'])
-    answer_list_1.append(result1)
-    result2 = render_rating_buttons2(
-        5,
-        f"Question 10:",
-        f"Please rate how well the edited result matches the style of **{target_prompt}**?",
-        4,
-        st.session_state.ratings['p1_q2'])
-    answer_list_2.append(result2)
-
-
+        result2 = render_rating_buttons(
+            5,
+            f"Question {2 * i}:",
+            f"Please rate how well the edited result matches the style of **{target_prompt}**?",
+            i - 1,
+            st.session_state.ratings['p1_q2'],
+            "radio2"
+        )
+        answer_list_2.append(result2)
 
     # Dislay this message when the test is completed
     # if st.session_state.test_completed:
@@ -548,11 +435,11 @@ elif st.session_state.page == "Listening test 1":
     #     f"Question {st.session_state.test_index+1}:",
     #     "Which edited result better preserves the original melody and vocal content from the source while successfully changing the musical style or instrument indicated in the brackets?")
 
-
-
     model_id = {0: "SteerEdit", 1: "MusicMagus", 2: "ZETA", 3: "DDIM",4: "SDEdit" }
 
     if st.button("Submit Ratings"):
+        # Redirect user back to the top anchor
+        st.markdown('<meta http-equiv="refresh" content="0; URL=#top">', unsafe_allow_html=True)       
         sample_id = audio_questions[st.session_state.test_index][0].split("/")[1]
         print(f"button clicked: {st.session_state.ratings['p1_q1'].get(st.session_state.test_index, None)=}")
         if len(answer_list_1) < 5 or len(answer_list_2) < 5:
@@ -598,7 +485,7 @@ elif st.session_state.page == "Listening test 1":
                     ] = a
 
                     user_ratings_df.loc[
-                        (user_ratings_df["Sample_ID"] == sample_id) & 
+                        (user_ratings_df["question2"] == sample_id) & 
                         (user_ratings_df["question_type"] == "test1") &
                         (user_ratings_df["Model_name"] == model_id[idx]), 
                         "question2"
@@ -631,9 +518,10 @@ elif st.session_state.page == "Listening test 1":
                 print(f"======={i in st.session_state.ratings['p1_q1'].keys()=}")
                 if i not in st.session_state.ratings['p1_q1'].keys():  # Find first unanswered question
                     st.session_state.test_index = i
-                    break  # Stop searching once we find an unanswered question
+                    break  # Stop searching once we find an unanswered question                          
             st.session_state.selected_ratings = None
-            st.rerun()
+            st.rerun()      
+
 
 elif st.session_state.page == "Listening test 2":
     # Show progress bar with clickable selection

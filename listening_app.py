@@ -144,9 +144,9 @@ elif "Tutorial" in st.session_state.page:
                 [user_ratings_df,
                  pd.DataFrame(
                      [{
-                        "question_type": "tutorial",
+                        "question_type": f"tutorial {tutorial_index}",
                         "Sample_ID": tutorial_index,
-                        "Model_name": "tutorial",
+                        "Model_name": f"tutorial {tutorial_index}",
                         "question1": result1,
                         "questions2": result2
                         }]
@@ -350,67 +350,16 @@ elif st.session_state.page == "Listening test 2":
             i - 1, st.session_state.test_index,
             st.session_state.ratings['p2_q2'], "test2q2"
         ))    
-    
-    # result1 = render_rating_buttons(
-    #     5,
-    #     f"Question 1:",
-    #     "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?")
-    # answer_list_1.append(result1)
-    # result2 = render_rating_buttons(
-    #     5,
-    #     f"Question 2:",
-    #     f"Please rate how well the edited result matches the style of **{concept_label}** on the reference music?")
-    # answer_list_1.append(result2)    
-    
 
-    # st.write("#### Edited result 2")
-    # st.audio(audio_files[4], format="audio/flac")
-    
-    # result1 = render_rating_buttons(
-    #     5,
-    #     f"Question 1:",
-    #     "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?")
-    # answer_list_1.append(result1)
-    # result2 = render_rating_buttons(
-    #     5,
-    #     f"Question 2:",
-    #     f"Please rate how well the edited result matches the style of **{concept_label}** on the reference music?")
-    # answer_list_1.append(result2)    
+    # Completion Messages
+    if st.session_state.test_completed2:
+        if not st.session_state.test_completed:
+            st.success("#### Thank you for completing part 2 of the test! You can review/edit your ratings and proceed to part 1")
+        else:
+            st.success("#### Thank you for completing everything! You can close the browser or review your ratings.")
 
-    # st.write("#### Edited result 3")
-    # st.audio(audio_files[5], format="audio/flac")
-    
-    # result1 = render_rating_buttons(
-    #     5,
-    #     f"Question 1:",
-    #     "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?")
-    # answer_list_1.append(result1)
-    # result2 = render_rating_buttons(
-    #     5,
-    #     f"Question 2:",
-    #     f"Please rate how well the edited result matches the style of **{concept_label}** on the reference music?")
-    # answer_list_1.append(result2)    
-
-    # # Dislay this message when the test is completed
-    # if (st.session_state.test_completed!=True) and st.session_state.test_completed2:
-    #     st.success(
-    #         """
-    #         #### Thank you for completing part 2 of the test!  
-    #         ##### You can review/edit your ratings in this part.
-    #         """
-    #     )
-    # elif (st.session_state.test_completed==True) and st.session_state.test_completed2:
-    #     st.success(
-    #         """
-    #         #### Thank you for completing everything!  
-    #         ##### You can close the browser now.  
-    #         ##### Or you can review/edit your ratings by clicking the progress bar
-    #         """
-    #     )
-
-    print()
     if st.button("Submit Ratings"):
-        sample_id = audio_questions[st.session_state.test_index][0].split("/")[1]
+        sample_id = audio_questions2[st.session_state.test_index][0].split("/")[1]
         
         if len([x for x in answer_list_1 if x is not None]) < 3 or len([x for x in answer_list_2 if x is not None]) < 3:
             st.error("Please select your rating before proceeding.")
@@ -444,9 +393,8 @@ elif st.session_state.page == "Listening test 2":
                 st.session_state.ratings['p2_q1'][st.session_state.test_index] = answer_list_1
                 st.session_state.ratings['p2_q2'][st.session_state.test_index] = answer_list_2
             
-            if len(st.session_state.ratings['p2_q1']) >= len(audio_questions):
-                st.session_state.page = "Tutorial 2"
-                st.session_state.test_completed = True
+            if len(st.session_state.ratings['p2_q1']) >= len(audio_questions2):
+                st.session_state.test_completed2 = True
                 finish_time = datetime.datetime.now()
                 if "finish_time" not in user_ratings_df.columns:
                     user_ratings_df["finish_time"] = None
@@ -454,7 +402,7 @@ elif st.session_state.page == "Listening test 2":
             
             user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
             
-            for i in range(len(audio_questions)):
+            for i in range(len(audio_questions2)):
                 if i not in st.session_state.ratings['p2_q1']:
                     st.session_state.test_index = i
                     st.rerun()

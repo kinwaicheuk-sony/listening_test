@@ -36,14 +36,9 @@ def render_rating_buttons(num_buttons, label, instruction, model_index, q_index,
     st.write(f"##### {label}")
     mos_score = {0: "Bad", 1: "Poor", 2: "Fair", 3: "Good", 4: "Excellent"}
 
-    if 'tutorial' in key_prefix:
-        # Retrieve previous selection if it exists
-        previous_selections = log.get(q_index, None)
-        previous_selection = previous_selections[model_index] if previous_selections is not None else None
-    elif 'test' in key_prefix:
-        # Retrieve previous selection if it exists
-        previous_selections = log.get(q_index, None)
-        previous_selection = previous_selections[model_index] if previous_selections is not None else None
+    # Retrieve previous selection if it exists
+    previous_selections = log.get(q_index, None)
+    previous_selection = previous_selections[model_index] if previous_selections is not None else None
 
     # Render radio buttons
     selected_option = st.radio(
@@ -120,6 +115,8 @@ if st.session_state.page == "User Info":
 
 elif "Tutorial" in st.session_state.page: 
     tutorial_index = 0 if st.session_state.page == "Tutorial 1" else 1
+    # update current tutorial index to session
+    st.session_state.tutorial_index = tutorial_index
     dict_name1 = f"t{tutorial_index + 1}_q1"
     dict_name2 = f"t{tutorial_index + 1}_q2"     
     file_paths = tutorial_questions[tutorial_index]
@@ -141,7 +138,6 @@ elif "Tutorial" in st.session_state.page:
         5, "Example 2", "Rate style match", 0,
         tutorial_index, st.session_state.ratings[dict_name2],
         f"tutorial{tutorial_index + 1}q2"))
-    
     if st.button("Next"):
         if (None in answer_list_1) or (None in answer_list_2):
             st.error("Please select your rating before proceeding.")
@@ -156,15 +152,13 @@ elif "Tutorial" in st.session_state.page:
                             "Sample_ID": tutorial_index,
                             "Model_name": f"tutorial {tutorial_index + 1}",
                             "question1": answer_list_1[0],
-                            "questions2": answer_list_2[0]
+                            "question2": answer_list_2[0]
                             }]
                             )],ignore_index=True)
-                user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
-                st.session_state.tutorial_index += 1
                 st.session_state.page = "Listening test 1" if tutorial_index == 0 else "Listening test 2"
                 st.session_state.ratings[dict_name1][st.session_state.tutorial_index] = answer_list_1
-                st.session_state.ratings[dict_name2][st.session_state.tutorial_index] = answer_list_2                
-                st.rerun()
+                st.session_state.ratings[dict_name2][st.session_state.tutorial_index] = answer_list_2
+                st.session_state.tutorial_index += 1                
             else:
                 user_ratings_df.loc[
                     (user_ratings_df["Sample_ID"] == tutorial_index) &
@@ -176,7 +170,8 @@ elif "Tutorial" in st.session_state.page:
                     (user_ratings_df["Model_name"] == f"tutorial {tutorial_index + 1}"), "question2"] = answer_list_2[0]
                 st.session_state.ratings[dict_name1][st.session_state.tutorial_index] = answer_list_1
                 st.session_state.ratings[dict_name2][st.session_state.tutorial_index] = answer_list_2
-
+            user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
+            st.rerun()
 elif st.session_state.page == "Listening test 1":
     model_id = {0: "SteerEdit", 1: "MusicMagus", 2: "ZETA", 3: "DDIM",4: "SDEdit" }
     st.session_state.question_type = 'test1'

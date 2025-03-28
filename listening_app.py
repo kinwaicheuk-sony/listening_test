@@ -96,7 +96,12 @@ st.session_state.page = st.sidebar.radio("Current progress", page_options, index
 # User Info Page
 if st.session_state.page == "User Info":
     st.write("### Information for users")
-    st.write("This project evaluates generative AI techniques for music style editing.")
+    st.write("This project evaluates generative AI techniques for music style editing.  \n\
+             The goal of this study is to evaluate two aspects of edited music that we have created using our generative AI system:    \n\
+              1. **Content Preservation**: How the edited result preserves the main musical contents (e.g., melody and vocal content) on the source music?   \n\
+              2. **Style Consistency**: How the edited result align precisely with the desired target style indicated in the edit instruction?    \n\
+              In this study, you will listen to either five or three edited samples per question. The test will take approximately 10 minutes.   \n\
+              **Please rate each edited sample based on the corresponding questions.**")
     st.text(f"Your Listener ID: {st.session_state.listener_id}")
     st.session_state.age = st.number_input("Enter your age", min_value=18, max_value=100, step=1)
     st.session_state.music_training_years = st.selectbox("Years of music training", list(range(51)), index=st.session_state.music_training_years or 0)
@@ -121,23 +126,56 @@ elif "Tutorial" in st.session_state.page:
     dict_name2 = f"t{tutorial_index + 1}_q2"     
     file_paths = tutorial_questions[tutorial_index]
     st.write(f"#### Tutorial {tutorial_index + 1}")
+    # st.write("This is a sample question for the next five ")
     st.text(f"Listener ID: {st.session_state.listener_id}")
+    if st.session_state.tutorial_index == 0:
+        st.write("#### Source Audio")
+        st.audio(file_paths[0], format="audio/flac")
+        st.write("#### Edited Result")
+        st.audio(file_paths[1], format="audio/flac")
 
-    st.write("#### Source Audio")
-    st.audio(file_paths[0], format="audio/flac")
-    st.write("#### Edited Result")
-    st.audio(file_paths[1], format="audio/flac")
+        st.write("#### Edited instruction: Edit the source **piano** music to a **flute** music.")
+        st.write("Please rate the edited result from 1-Bad to 5-Excellent according to belows questions:")
+        answer_list_1, answer_list_2 = [], []
 
-    answer_list_1, answer_list_2 = [], []
+        answer_list_1.append(render_rating_buttons(
+            5, "Question 1", "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?", 0,
+            tutorial_index, st.session_state.ratings[dict_name1],
+            f"tutorial{tutorial_index + 1}q1"))
+        answer_list_2.append(render_rating_buttons(
+            5, "Question 2", "Please rate how well the edited result matches the style of **flute**?", 0,
+            tutorial_index, st.session_state.ratings[dict_name2],
+            f"tutorial{tutorial_index + 1}q2"))
+    elif st.session_state.tutorial_index == 1:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write("#### Source")
+            st.audio(file_paths[0], format="audio/flac")
+            # st.write("##### source prompt")
+            # st.write("A famous classicial music played on a [**piano**]")
+        with col2:
+            st.write("#### Reference: Bouzouki")
+            st.audio(file_paths[1], format="audio/flac")
+            # st.write("##### Target prompt")
+            # st.write("A famous classicial music played on a [**bouzouki**]")            
+        st.write("#### Edited instruction: Edit the source **piano** music to a **bouzouki** music.")
+        # col1, col2 = st.columns(2)
+        st.write("#### Edited result")
+        st.audio(file_paths[3], format="audio/flac")
 
-    answer_list_1.append(render_rating_buttons(
-        5, "Example 1", "Rate content consistency with source music", 0,
-        tutorial_index, st.session_state.ratings[dict_name1],
-        f"tutorial{tutorial_index + 1}q1"))
-    answer_list_2.append(render_rating_buttons(
-        5, "Example 2", "Rate style match", 0,
-        tutorial_index, st.session_state.ratings[dict_name2],
-        f"tutorial{tutorial_index + 1}q2"))
+        answer_list_1, answer_list_2 = [], []
+
+        answer_list_1.append(render_rating_buttons(
+            5, "Question 1", "Please rate how well does the content of the edited result (e.g., melody and vocal elements) remain consistent with the source music?", 0,
+            tutorial_index, st.session_state.ratings[dict_name1],
+            f"tutorial{tutorial_index + 1}q1"))
+        answer_list_2.append(render_rating_buttons(
+            5, "Question 2", "Please rate how well the edited result matches the style of **bouzouki** in the reference music?", 0,
+            tutorial_index, st.session_state.ratings[dict_name2],
+            f"tutorial{tutorial_index + 1}q2"))          
+    else:
+        raise ValueError('Case not considered')
+
     if st.button("Next"):
         if (None in answer_list_1) or (None in answer_list_2):
             st.error("Please select your rating before proceeding.")
@@ -292,19 +330,6 @@ elif st.session_state.page == "Listening test 2":
 
     model_id = {0: "SteerMusic", 1: "textinv", 2: "DreamSound" }
 
-    # Show progress bar with clickable selection
-    st.write("### Progress")
-    num_cols = 5
-    cols = st.columns(num_cols)
-    for idx, _ in enumerate(audio_questions2):
-        completed = idx in st.session_state.ratings['p2_q1']
-        is_current = idx == st.session_state.test_index2
-        status = "✅" if completed and not is_current else "▶️" if is_current else "⬜"
-        with cols[idx % num_cols]:
-            if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):
-                st.session_state.test_index2 = idx
-                st.rerun()
-
     # Get current question audio files
     audio_files = audio_questions2[st.session_state.test_index2]
     # make sure there is no error in sample name
@@ -370,6 +395,19 @@ elif st.session_state.page == "Listening test 2":
             st.success("#### Thank you for completing part 2 of the test! You can review/edit your ratings and proceed to part 1")
         else:
             st.success("#### Thank you for completing everything! You can close the browser or review your ratings.")
+
+    # Show progress bar with clickable selection
+    st.write("### Progress")
+    num_cols = 5
+    cols = st.columns(num_cols)
+    for idx, _ in enumerate(audio_questions2):
+        completed = idx in st.session_state.ratings['p2_q1']
+        is_current = idx == st.session_state.test_index2
+        status = "✅" if completed and not is_current else "▶️" if is_current else "⬜"
+        with cols[idx % num_cols]:
+            if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):
+                st.session_state.test_index2 = idx
+                st.rerun()
 
     if st.button("Submit Ratings"):
         sample_id = audio_questions2[st.session_state.test_index2][0].split("/")[1]

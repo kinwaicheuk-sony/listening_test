@@ -23,13 +23,13 @@
             "SteerEdit_demo_flac/Sample1/SDEdit.flac"
         ],
         [
-            "SteerEdit_demo_flac/Sample9/source.flac",
-            "SteerEdit_demo_flac/Sample9/prompt.txt",
-            "SteerEdit_demo_flac/Sample9/dds.flac",
-            "SteerEdit_demo_flac/Sample9/musicmagus.flac",
-            "SteerEdit_demo_flac/Sample9/ZETA.flac",
-            "SteerEdit_demo_flac/Sample9/DDIM.flac",
-            "SteerEdit_demo_flac/Sample9/SDEdit.flac"
+            "SteerEdit_demo_flac/Sample2/source.flac",
+            "SteerEdit_demo_flac/Sample2/prompt.txt",
+            "SteerEdit_demo_flac/Sample2/dds.flac",
+            "SteerEdit_demo_flac/Sample2/musicmagus.flac",
+            "SteerEdit_demo_flac/Sample2/ZETA.flac",
+            "SteerEdit_demo_flac/Sample2/DDIM.flac",
+            "SteerEdit_demo_flac/Sample2/SDEdit.flac"
         ],
         [
             "SteerEdit_demo_flac/Sample10/source.flac",

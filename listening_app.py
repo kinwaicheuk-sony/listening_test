@@ -118,8 +118,10 @@ if st.session_state.page == "User Info":
             st.success("Information saved! Proceed to the test.")
             st.rerun()
 
-elif "Tutorial" in st.session_state.page:
+elif "Tutorial" in st.session_state.page: 
     tutorial_index = 0 if st.session_state.page == "Tutorial 1" else 1
+    dict_name1 = f"t{tutorial_index + 1}_q1"
+    dict_name2 = f"t{tutorial_index + 1}_q2"     
     file_paths = tutorial_questions[tutorial_index]
     st.write(f"#### Tutorial {tutorial_index + 1}")
     st.text(f"Listener ID: {st.session_state.listener_id}")
@@ -129,37 +131,55 @@ elif "Tutorial" in st.session_state.page:
     st.write("#### Edited Result")
     st.audio(file_paths[1], format="audio/flac")
 
-    result1 = render_rating_buttons(5, "Example 1", "Rate content consistency with source music", 0, tutorial_index, st.session_state.ratings, f"tutorial{tutorial_index + 1}q1")
-    result2 = render_rating_buttons(5, "Example 2", "Rate style match", 0, tutorial_index, st.session_state.ratings, f"tutorial{tutorial_index + 1}q2")
+    answer_list_1, answer_list_2 = [], []
 
-    st.session_state.ratings[f"t{tutorial_index + 1}_q1"] = result1
-    st.session_state.ratings[f"t{tutorial_index + 1}_q2"] = result2
+    answer_list_1.append(render_rating_buttons(
+        5, "Example 1", "Rate content consistency with source music", 0,
+        tutorial_index, st.session_state.ratings[dict_name1],
+        f"tutorial{tutorial_index + 1}q1"))
+    answer_list_2.append(render_rating_buttons(
+        5, "Example 2", "Rate style match", 0,
+        tutorial_index, st.session_state.ratings[dict_name2],
+        f"tutorial{tutorial_index + 1}q2"))
     
     if st.button("Next"):
-        if None in [result1, result2]:
+        if (None in answer_list_1) or (None in answer_list_2):
             st.error("Please select your rating before proceeding.")
         else:
             user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
-            user_ratings_df = pd.concat(
-                [user_ratings_df,
-                 pd.DataFrame(
-                     [{
-                        "question_type": f"tutorial {tutorial_index}",
-                        "Sample_ID": tutorial_index,
-                        "Model_name": f"tutorial {tutorial_index}",
-                        "question1": result1,
-                        "questions2": result2
-                        }]
-                        )],ignore_index=True)
-            user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
-            st.session_state.tutorial_index += 1
-            st.session_state.page = "Listening test 1" if tutorial_index == 0 else "Listening test 2"
-            st.rerun()
+            if st.session_state.tutorial_index not in st.session_state.ratings[dict_name1]: 
+                user_ratings_df = pd.concat(
+                    [user_ratings_df,
+                    pd.DataFrame(
+                        [{
+                            "question_type": f"tutorial {tutorial_index + 1}",
+                            "Sample_ID": tutorial_index,
+                            "Model_name": f"tutorial {tutorial_index + 1}",
+                            "question1": answer_list_1[0],
+                            "questions2": answer_list_2[0]
+                            }]
+                            )],ignore_index=True)
+                user_ratings_df.to_csv(st.session_state.user_ratings_file, index=False)
+                st.session_state.tutorial_index += 1
+                st.session_state.page = "Listening test 1" if tutorial_index == 0 else "Listening test 2"
+                st.session_state.ratings[dict_name1][st.session_state.tutorial_index] = answer_list_1
+                st.session_state.ratings[dict_name2][st.session_state.tutorial_index] = answer_list_2                
+                st.rerun()
+            else:
+                user_ratings_df.loc[
+                    (user_ratings_df["Sample_ID"] == tutorial_index) &
+                    (user_ratings_df["question_type"] == f"tutorial {tutorial_index + 1}") &
+                    (user_ratings_df["Model_name"] == f"tutorial {tutorial_index + 1}"), "question1"] =     st.session_state.ratings[dict_name1][st.session_state.tutorial_index] = answer_list_1[0]
+                user_ratings_df.loc[
+                    (user_ratings_df["Sample_ID"] == tutorial_index) &
+                    (user_ratings_df["question_type"] == f"tutorial {tutorial_index + 1}") &
+                    (user_ratings_df["Model_name"] == f"tutorial {tutorial_index + 1}"), "question2"] = answer_list_2[0]
+                st.session_state.ratings[dict_name1][st.session_state.tutorial_index] = answer_list_1
+                st.session_state.ratings[dict_name2][st.session_state.tutorial_index] = answer_list_2
 
 elif st.session_state.page == "Listening test 1":
     model_id = {0: "SteerEdit", 1: "MusicMagus", 2: "ZETA", 3: "DDIM",4: "SDEdit" }
     st.session_state.question_type = 'test1'
-    print(f"***{st.session_state.ratings['p1_q1'].keys()=}")
 
     # Get current question audio files
     audio_files = audio_questions[st.session_state.test_index]
@@ -199,7 +219,6 @@ elif st.session_state.page == "Listening test 1":
             i - 1, st.session_state.test_index,
             st.session_state.ratings['p1_q2'], "test1q2"
         ))
-
     # Completion Messages
     if st.session_state.test_completed:
         if not st.session_state.test_completed2:
@@ -228,7 +247,6 @@ elif st.session_state.page == "Listening test 1":
             st.error("Please select your rating before proceeding.")
         else:
             user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
-            
             if st.session_state.test_index not in st.session_state.ratings['p1_q1']:
                 for idx, (a, b) in enumerate(zip(answer_list_1, answer_list_2)):
                     new_entry = pd.DataFrame([{
@@ -285,11 +303,11 @@ elif st.session_state.page == "Listening test 2":
     cols = st.columns(num_cols)
     for idx, _ in enumerate(audio_questions2):
         completed = idx in st.session_state.ratings['p2_q1']
-        is_current = idx == st.session_state.test_index
+        is_current = idx == st.session_state.test_index2
         status = "✅" if completed and not is_current else "▶️" if is_current else "⬜"
         with cols[idx % num_cols]:
             if st.button(f"{status} {idx+1}", key=f"progress_{idx}"):
-                st.session_state.test_index = idx
+                st.session_state.test_index2 = idx
                 st.rerun()
 
     # Get current question audio files
@@ -340,14 +358,14 @@ elif st.session_state.page == "Listening test 2":
         answer_list_1.append(render_rating_buttons(
             5, f"Question {2 * i - 1}:",
             "Please rate how well the content (e.g., melody and vocal elements) remains consistent with the source music.",
-            i - 1, st.session_state.test_index,
+            i - 1, st.session_state.test_index2,
             st.session_state.ratings['p2_q1'], "test2q1"
         ))
 
         answer_list_2.append(render_rating_buttons(
             5, f"Question {2 * i}:",
             f"Please rate how well the edited result matches the style of **{concept_label}**.",
-            i - 1, st.session_state.test_index,
+            i - 1, st.session_state.test_index2,
             st.session_state.ratings['p2_q2'], "test2q2"
         ))    
 
@@ -359,17 +377,17 @@ elif st.session_state.page == "Listening test 2":
             st.success("#### Thank you for completing everything! You can close the browser or review your ratings.")
 
     if st.button("Submit Ratings"):
-        sample_id = audio_questions2[st.session_state.test_index][0].split("/")[1]
+        sample_id = audio_questions2[st.session_state.test_index2][0].split("/")[1]
         
         if len([x for x in answer_list_1 if x is not None]) < 3 or len([x for x in answer_list_2 if x is not None]) < 3:
             st.error("Please select your rating before proceeding.")
         else:
             user_ratings_df = pd.read_csv(st.session_state.user_ratings_file)
             
-            if st.session_state.test_index not in st.session_state.ratings['p2_q1']:
+            if st.session_state.test_index2 not in st.session_state.ratings['p2_q1']:
                 for idx, (a, b) in enumerate(zip(answer_list_1, answer_list_2)):
                     new_entry = pd.DataFrame([{
-                        "question_type": 'test1',
+                        "question_type": 'test2',
                         "Sample_ID": sample_id,
                         "Model_name": model_id[idx],
                         "question1": a,
@@ -377,10 +395,10 @@ elif st.session_state.page == "Listening test 2":
                     }])
                     user_ratings_df = pd.concat([user_ratings_df, new_entry], ignore_index=True)
                 
-                st.session_state.ratings['p2_q1'][st.session_state.test_index] = answer_list_1
-                st.session_state.ratings['p2_q2'][st.session_state.test_index] = answer_list_2
+                st.session_state.ratings['p2_q1'][st.session_state.test_index2] = answer_list_1
+                st.session_state.ratings['p2_q2'][st.session_state.test_index2] = answer_list_2
             else:
-                for idx, (a, b) in enumerate(zip(answer_list_1, answer_list_2)):
+                for idx, (a, b) in enumerate(zip(answer_list_1, answer_list_2)):                
                     user_ratings_df.loc[
                         (user_ratings_df["Sample_ID"] == sample_id) &
                         (user_ratings_df["question_type"] == "test2") &
@@ -390,8 +408,8 @@ elif st.session_state.page == "Listening test 2":
                         (user_ratings_df["question_type"] == "test2") &
                         (user_ratings_df["Model_name"] == model_id[idx]), "question2"] = b
                 
-                st.session_state.ratings['p2_q1'][st.session_state.test_index] = answer_list_1
-                st.session_state.ratings['p2_q2'][st.session_state.test_index] = answer_list_2
+                st.session_state.ratings['p2_q1'][st.session_state.test_index2] = answer_list_1
+                st.session_state.ratings['p2_q2'][st.session_state.test_index2] = answer_list_2
             
             if len(st.session_state.ratings['p2_q1']) >= len(audio_questions2):
                 st.session_state.test_completed2 = True
@@ -404,7 +422,7 @@ elif st.session_state.page == "Listening test 2":
             
             for i in range(len(audio_questions2)):
                 if i not in st.session_state.ratings['p2_q1']:
-                    st.session_state.test_index = i
+                    st.session_state.test_index2 = i
                     st.rerun()
                     break
             st.rerun()
